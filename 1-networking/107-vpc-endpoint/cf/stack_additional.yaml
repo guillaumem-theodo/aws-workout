@@ -6,7 +6,7 @@
       Default: 'aws-workout'
 
   Resources:
-    S3BucketSameRegion:
+    S3BucketAnotherRegion:
       Type: 'AWS::S3::Bucket'
       Properties:
         BucketName: unique-name-s3-bucket-2-107
