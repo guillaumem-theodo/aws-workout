@@ -14,5 +14,5 @@ nslookup "$ec2_1_public_dns"
 echo "❌ EC2 does not have public DNS name:'$ec2_2_public_dns' (missing) - private DNS: $ec2_2_private_dns"
 nslookup "$ec2_2_private_dns"
 
-echo "✅ Private DNS '$ec2_1_private_dns' can be used from with the VPC"
+echo "✅ Private DNS name '$ec2_2_private_dns' can be used from with the VPC - should resolve to private IP"
 ssh -i ./aws-workout-key-pair.pem -o ConnectTimeout=10 ec2-user@"$ec2_1_public_ip" nslookup "$ec2_2_private_dns"
