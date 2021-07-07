@@ -31,3 +31,8 @@ TUTORIAL_KEY="stack-$(basename "$TUTORIAL_DIR")"
 source ./backend-env.conf
 echo "Applying CloudFormation Tutorial '$TUTORIAL_KEY' in $TUTORIAL_REGION"
 (cd "$1"/cf || exit; aws cloudformation create-stack --stack-name "$TUTORIAL_KEY" --region "$TUTORIAL_REGION" --profile aws-workout --template-body file://./stack.yaml)
+
+if [ -f "$1"/cf/stack_additional.yaml ]; then
+  echo "Adding an additional stack in another region ($TUTORIAL_ANOTHER_REGION)";
+  (cd "$1"/cf || exit; aws cloudformation create-stack --stack-name "$TUTORIAL_KEY-additional" --region "$TUTORIAL_ANOTHER_REGION" --profile aws-workout --template-body file://./stack_additional.yaml)
+fi

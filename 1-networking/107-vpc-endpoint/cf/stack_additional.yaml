@@ -1,0 +1,17 @@
+---
+  AWSTemplateFormatVersion: "2010-09-09"
+  Parameters:
+    dojo:
+      Type: String
+      Default: 'aws-workout'
+
+  Resources:
+    S3BucketSameRegion:
+      Type: 'AWS::S3::Bucket'
+      Properties:
+        BucketName: unique-name-s3-bucket-2-107
+        Tags:
+          - Key: "Name"
+            Value: "net-107-s3-bucket-2"
+          - Key: "Purpose"
+            Value: !Ref dojo
