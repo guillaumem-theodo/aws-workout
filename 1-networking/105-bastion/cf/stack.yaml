@@ -9,7 +9,7 @@
       Default: '/aws/service/ami-amazon-linux-latest/amzn2-ami-hvm-x86_64-gp2'
 
   Resources:
-    IGW105:
+    IGW:
       Type: AWS::EC2::InternetGateway
       Properties:
         Tags:
@@ -18,15 +18,15 @@
           - Key: "Purpose"
             Value: !Ref dojo
 
-    IGW105Attachment:
+    IGWAttachment:
       Type: AWS::EC2::VPCGatewayAttachment
       Properties:
-        InternetGatewayId: !Ref IGW105
+        InternetGatewayId: !Ref IGW
         VpcId: {"Fn::ImportValue" : "net-101-vpc-id"}
 
-    RT105:
+    Net105RouteTable1:
       Type: AWS::EC2::RouteTable
-      DependsOn: IGW105Attachment
+      DependsOn: IGWAttachment
       Properties:
         VpcId: {"Fn::ImportValue" : "net-101-vpc-id"}
         Tags:
@@ -36,21 +36,19 @@
             Value: !Ref dojo
     RouteToInternet:
       Type: AWS::EC2::Route
-      DependsOn: IGW105
+      DependsOn: IGW
       Properties:
-         RouteTableId:
-           Ref: RT105
+         RouteTableId: !Ref Net105RouteTable1
          DestinationCidrBlock: 0.0.0.0/0
          GatewayId:
-           Ref: IGW105
+           Ref: IGW
     RTSubnet1Association:
       Type: AWS::EC2::SubnetRouteTableAssociation
       Properties:
-        RouteTableId:
-          Ref: RT105
+        RouteTableId: !Ref Net105RouteTable1
         SubnetId: {"Fn::ImportValue" : "net-102-subnet-1-id"}
 
-    SG105:
+    Net105SecurityGroup1:
       Type: AWS::EC2::SecurityGroup
       Properties:
         VpcId: {"Fn::ImportValue" : "net-101-vpc-id"}
@@ -74,6 +72,7 @@
             Value: "net-105-sg-1"
           - Key: "Purpose"
             Value: !Ref dojo
+
     EC2Number1:
       Type: AWS::EC2::Instance
       Properties:
@@ -84,7 +83,7 @@
           - AssociatePublicIpAddress: "true"
             DeviceIndex: "0"
             GroupSet:
-              - !Ref SG105
+              - !Ref Net105SecurityGroup1
             SubnetId: {"Fn::ImportValue" : "net-102-subnet-1-id"}
         Tags:
           - Key: "Name"
@@ -92,7 +91,7 @@
           - Key: "Purpose"
             Value: !Ref dojo
 
-    RT105Private:
+    Net105RouteTable2:
       Type: AWS::EC2::RouteTable
       Properties:
         VpcId: {"Fn::ImportValue" : "net-101-vpc-id"}
@@ -104,11 +103,10 @@
     RTSubnet2Association:
       Type: AWS::EC2::SubnetRouteTableAssociation
       Properties:
-        RouteTableId:
-          Ref: RT105Private
+        RouteTableId: !Ref Net105RouteTable2
         SubnetId: {"Fn::ImportValue" : "net-102-subnet-2-id"}
 
-    SG105Private:
+    Net105SecurityGroup2:
       Type: AWS::EC2::SecurityGroup
       Properties:
         VpcId: {"Fn::ImportValue" : "net-101-vpc-id"}
@@ -117,7 +115,7 @@
         - IpProtocol: -1
           FromPort: 0
           ToPort: 0
-          SourceSecurityGroupId: !Ref SG105
+          SourceSecurityGroupId: !Ref Net105SecurityGroup1
         Tags:
           - Key: "Name"
             Value: "net-105-sg-2"
@@ -134,7 +132,7 @@
           - AssociatePublicIpAddress: "false"
             DeviceIndex: "0"
             GroupSet:
-              - !Ref SG105Private
+              - !Ref Net105SecurityGroup2
             SubnetId: {"Fn::ImportValue" : "net-102-subnet-2-id"}
         Tags:
           - Key: "Name"
@@ -152,10 +150,10 @@
       Export:
         Name: 'net-105-ec2-2-private-ip'
     privateRouteTable:
-      Value: !Ref RT105Private
+      Value: !Ref Net105RouteTable2
       Export:
         Name: 'net-105-rt-2-id'
     privateSecurityGroup:
-      Value: !Ref SG105Private
+      Value: !Ref Net105SecurityGroup2
       Export:
         Name: 'net-105-sg-2-id'
