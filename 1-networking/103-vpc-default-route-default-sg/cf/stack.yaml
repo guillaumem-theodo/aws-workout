@@ -1,0 +1,36 @@
+---
+  AWSTemplateFormatVersion: "2010-09-09"
+  Parameters:
+    dojo:
+      Type: String
+      Default: 'aws-workout'
+    LatestAmiId:
+      Type: 'AWS::SSM::Parameter::Value<AWS::EC2::Image::Id>'
+      Default: '/aws/service/ami-amazon-linux-latest/amzn2-ami-hvm-x86_64-gp2'
+
+  Resources:
+    EC2Number1:
+      Type: AWS::EC2::Instance
+      Properties:
+        InstanceType: 't2.micro'
+        KeyName: 'aws-workout-key'
+        ImageId: !Ref LatestAmiId
+        NetworkInterfaces:
+          - AssociatePublicIpAddress: "true"
+            DeviceIndex: "0"
+            SubnetId: {"Fn::ImportValue" : "net-102-subnet-1-id"}
+        Tags:
+          - Key: "Name"
+            Value: "net-103-ec2-1"
+          - Key: "Purpose"
+            Value: !Ref dojo
+
+  Outputs:
+    firstEc2:
+      Value: !Ref EC2Number1
+      Export:
+        Name: 'net-103-ec2-1-id'
+    firstEc2PublicIp:
+      Value: !GetAtt EC2Number1.PublicIp
+      Export:
+        Name: 'net-103-ec2-1-public-ip'

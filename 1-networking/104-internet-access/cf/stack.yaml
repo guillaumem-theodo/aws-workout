@@ -1,0 +1,89 @@
+---
+  AWSTemplateFormatVersion: "2010-09-09"
+  Parameters:
+    dojo:
+      Type: String
+      Default: 'aws-workout'
+    LatestAmiId:
+      Type: 'AWS::SSM::Parameter::Value<AWS::EC2::Image::Id>'
+      Default: '/aws/service/ami-amazon-linux-latest/amzn2-ami-hvm-x86_64-gp2'
+
+  Resources:
+    IGW104:
+      Type: AWS::EC2::InternetGateway
+      Properties:
+        Tags:
+          - Key: "Name"
+            Value: "net-104-igw"
+          - Key: "Purpose"
+            Value: !Ref dojo
+
+    IGW104Attachment:
+      Type: AWS::EC2::VPCGatewayAttachment
+      Properties:
+        InternetGatewayId: !Ref IGW104
+        VpcId: {"Fn::ImportValue" : "net-101-vpc-id"}
+
+    RT104:
+      Type: AWS::EC2::RouteTable
+      DependsOn: IGW104Attachment
+      Properties:
+        VpcId: {"Fn::ImportValue" : "net-101-vpc-id"}
+        Tags:
+          - Key: "Name"
+            Value: "net-104-rt"
+          - Key: "Purpose"
+            Value: !Ref dojo
+    RouteToInternet:
+      Type: AWS::EC2::Route
+      DependsOn: IGW104
+      Properties:
+         RouteTableId:
+           Ref: RT104
+         DestinationCidrBlock: 0.0.0.0/0
+         GatewayId:
+           Ref: IGW104
+    RTSubnetAssociation:
+      Type: AWS::EC2::SubnetRouteTableAssociation
+      Properties:
+        RouteTableId:
+          Ref: RT104
+        SubnetId: {"Fn::ImportValue" : "net-102-subnet-1-id"}
+
+
+    SG104:
+      Type: AWS::EC2::SecurityGroup
+      Properties:
+        VpcId: {"Fn::ImportValue" : "net-101-vpc-id"}
+        GroupDescription: "Security group for net-104 dojo"
+        SecurityGroupIngress:
+        - IpProtocol: tcp
+          FromPort: 22
+          ToPort: 22
+          CidrIp: 0.0.0.0/0
+        - IpProtocol: icmp
+          FromPort: -1
+          ToPort: -1
+          CidrIp: 0.0.0.0/0
+        Tags:
+          - Key: "Name"
+            Value: "net-104-sg"
+          - Key: "Purpose"
+            Value: !Ref dojo
+    EC2Number1:
+      Type: AWS::EC2::Instance
+      Properties:
+        InstanceType: 't2.micro'
+        KeyName: 'aws-workout-key'
+        ImageId: !Ref LatestAmiId
+        NetworkInterfaces:
+          - AssociatePublicIpAddress: "true"
+            DeviceIndex: "0"
+            GroupSet:
+              - !Ref SG104
+            SubnetId: {"Fn::ImportValue" : "net-102-subnet-1-id"}
+        Tags:
+          - Key: "Name"
+            Value: "net-104-ec2-1"
+          - Key: "Purpose"
+            Value: !Ref dojo

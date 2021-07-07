@@ -1,0 +1,161 @@
+---
+  AWSTemplateFormatVersion: "2010-09-09"
+  Parameters:
+    dojo:
+      Type: String
+      Default: 'aws-workout'
+    LatestAmiId:
+      Type: 'AWS::SSM::Parameter::Value<AWS::EC2::Image::Id>'
+      Default: '/aws/service/ami-amazon-linux-latest/amzn2-ami-hvm-x86_64-gp2'
+
+  Resources:
+    IGW105:
+      Type: AWS::EC2::InternetGateway
+      Properties:
+        Tags:
+          - Key: "Name"
+            Value: "net-105-igw"
+          - Key: "Purpose"
+            Value: !Ref dojo
+
+    IGW105Attachment:
+      Type: AWS::EC2::VPCGatewayAttachment
+      Properties:
+        InternetGatewayId: !Ref IGW105
+        VpcId: {"Fn::ImportValue" : "net-101-vpc-id"}
+
+    RT105:
+      Type: AWS::EC2::RouteTable
+      DependsOn: IGW105Attachment
+      Properties:
+        VpcId: {"Fn::ImportValue" : "net-101-vpc-id"}
+        Tags:
+          - Key: "Name"
+            Value: "net-105-rt-1"
+          - Key: "Purpose"
+            Value: !Ref dojo
+    RouteToInternet:
+      Type: AWS::EC2::Route
+      DependsOn: IGW105
+      Properties:
+         RouteTableId:
+           Ref: RT105
+         DestinationCidrBlock: 0.0.0.0/0
+         GatewayId:
+           Ref: IGW105
+    RTSubnet1Association:
+      Type: AWS::EC2::SubnetRouteTableAssociation
+      Properties:
+        RouteTableId:
+          Ref: RT105
+        SubnetId: {"Fn::ImportValue" : "net-102-subnet-1-id"}
+
+    SG105:
+      Type: AWS::EC2::SecurityGroup
+      Properties:
+        VpcId: {"Fn::ImportValue" : "net-101-vpc-id"}
+        GroupDescription: "Security group for net-105 Bastion"
+        SecurityGroupIngress:
+        - IpProtocol: tcp
+          FromPort: 22
+          ToPort: 22
+          CidrIp: 0.0.0.0/0
+        - IpProtocol: icmp
+          FromPort: -1
+          ToPort: -1
+          CidrIp: 0.0.0.0/0
+        SecurityGroupEgress:
+          - IpProtocol: -1
+            FromPort: 0
+            ToPort: 0
+            CidrIp: 0.0.0.0/0
+        Tags:
+          - Key: "Name"
+            Value: "net-105-sg-1"
+          - Key: "Purpose"
+            Value: !Ref dojo
+    EC2Number1:
+      Type: AWS::EC2::Instance
+      Properties:
+        InstanceType: 't2.micro'
+        KeyName: 'aws-workout-key'
+        ImageId: !Ref LatestAmiId
+        NetworkInterfaces:
+          - AssociatePublicIpAddress: "true"
+            DeviceIndex: "0"
+            GroupSet:
+              - !Ref SG105
+            SubnetId: {"Fn::ImportValue" : "net-102-subnet-1-id"}
+        Tags:
+          - Key: "Name"
+            Value: "net-105-ec2-1"
+          - Key: "Purpose"
+            Value: !Ref dojo
+
+    RT105Private:
+      Type: AWS::EC2::RouteTable
+      Properties:
+        VpcId: {"Fn::ImportValue" : "net-101-vpc-id"}
+        Tags:
+          - Key: "Name"
+            Value: "net-105-rt-2"
+          - Key: "Purpose"
+            Value: !Ref dojo
+    RTSubnet2Association:
+      Type: AWS::EC2::SubnetRouteTableAssociation
+      Properties:
+        RouteTableId:
+          Ref: RT105Private
+        SubnetId: {"Fn::ImportValue" : "net-102-subnet-2-id"}
+
+    SG105Private:
+      Type: AWS::EC2::SecurityGroup
+      Properties:
+        VpcId: {"Fn::ImportValue" : "net-101-vpc-id"}
+        GroupDescription: "Security group for net-105 Private Subnet"
+        SecurityGroupIngress:
+        - IpProtocol: -1
+          FromPort: 0
+          ToPort: 0
+          SourceSecurityGroupId: !Ref SG105
+        Tags:
+          - Key: "Name"
+            Value: "net-105-sg-2"
+          - Key: "Purpose"
+            Value: !Ref dojo
+
+    EC2Number2:
+      Type: AWS::EC2::Instance
+      Properties:
+        InstanceType: 't2.micro'
+        KeyName: 'aws-workout-key'
+        ImageId: !Ref LatestAmiId
+        NetworkInterfaces:
+          - AssociatePublicIpAddress: "false"
+            DeviceIndex: "0"
+            GroupSet:
+              - !Ref SG105Private
+            SubnetId: {"Fn::ImportValue" : "net-102-subnet-2-id"}
+        Tags:
+          - Key: "Name"
+            Value: "net-105-ec2-2"
+          - Key: "Purpose"
+            Value: !Ref dojo
+
+  Outputs:
+    bastionEc2PublicIp:
+      Value: !GetAtt EC2Number1.PublicIp
+      Export:
+        Name: 'net-105-ec2-1-public-ip'
+    privateEc2PrivateIp:
+      Value: !GetAtt EC2Number2.PrivateIp
+      Export:
+        Name: 'net-105-ec2-2-private-ip'
+    privateRouteTable:
+      Value: !Ref RT105Private
+      Export:
+        Name: 'net-105-rt-2-id'
+    privateSecurityGroup:
+      Value: !Ref SG105Private
+      Export:
+        Name: 'net-105-sg-2-id'

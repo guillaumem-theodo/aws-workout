@@ -1,0 +1,4 @@
+101-basic-vpc
+102-basic-subnets
+105-bastion
+106-nat-gtw
