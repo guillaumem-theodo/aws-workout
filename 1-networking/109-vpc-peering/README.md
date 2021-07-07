@@ -12,6 +12,8 @@ Create Three VPC with **non overlapping** CIDR
 - For this second VPC Peering Connection, enable private DNS resolution
 - Update the route tables to route traffic from/to other VPCs through peering connection
 
+⚠️⚠️ DNS Resolution options in VPC peering IS NOT AVAILABLE in CloudFormation. You will have to enable it either in AWS Console or through AWS CLI ⚠️⚠️
+
 
 - Observe that EC2 in VPC 2 is reachable from EC2 in VPC 1 using private IPs
 - Observe that EC2 in VPC 1 is reachable from EC2 in VPC 2 using private IPs
