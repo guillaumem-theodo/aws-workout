@@ -9,7 +9,7 @@
       Default: '/aws/service/ami-amazon-linux-latest/amzn2-ami-hvm-x86_64-gp2'
 
   Resources:
-    IGW104:
+    IGW:
       Type: AWS::EC2::InternetGateway
       Properties:
         Tags:
@@ -18,15 +18,15 @@
           - Key: "Purpose"
             Value: !Ref dojo
 
-    IGW104Attachment:
+    IGWAttachment:
       Type: AWS::EC2::VPCGatewayAttachment
       Properties:
-        InternetGatewayId: !Ref IGW104
+        InternetGatewayId: !Ref IGW
         VpcId: {"Fn::ImportValue" : "net-101-vpc-id"}
 
-    RT104:
+    Net104RouteTable:
       Type: AWS::EC2::RouteTable
-      DependsOn: IGW104Attachment
+      DependsOn: IGWAttachment
       Properties:
         VpcId: {"Fn::ImportValue" : "net-101-vpc-id"}
         Tags:
@@ -36,22 +36,18 @@
             Value: !Ref dojo
     RouteToInternet:
       Type: AWS::EC2::Route
-      DependsOn: IGW104
+      DependsOn: IGW
       Properties:
-         RouteTableId:
-           Ref: RT104
+         RouteTableId: !Ref Net104RouteTable
          DestinationCidrBlock: 0.0.0.0/0
-         GatewayId:
-           Ref: IGW104
+         GatewayId: !Ref IGW
     RTSubnetAssociation:
       Type: AWS::EC2::SubnetRouteTableAssociation
       Properties:
-        RouteTableId:
-          Ref: RT104
+        RouteTableId: !Ref Net104RouteTable
         SubnetId: {"Fn::ImportValue" : "net-102-subnet-1-id"}
 
-
-    SG104:
+    Net104SecurityGroup:
       Type: AWS::EC2::SecurityGroup
       Properties:
         VpcId: {"Fn::ImportValue" : "net-101-vpc-id"}
@@ -80,7 +76,7 @@
           - AssociatePublicIpAddress: "true"
             DeviceIndex: "0"
             GroupSet:
-              - !Ref SG104
+              - !Ref Net104SecurityGroup
             SubnetId: {"Fn::ImportValue" : "net-102-subnet-1-id"}
         Tags:
           - Key: "Name"
