@@ -159,6 +159,13 @@ resource "aws_s3_bucket" "s3-bucket-1-203" {
   }
 }
 
+resource "aws_s3_bucket_object" "s3-bucket-object-1-203" {
+  bucket = aws_s3_bucket.s3-bucket-1-203.bucket
+  key    = "a_file_uploaded_in_bucket"
+  source = "README.md"
+  etag = filemd5("README.md")
+}
+
 ## CREATE an EC2 inside the subnet (with the associated route table) and inside the security group
 ## As a consequence the EC2 should be reachable (ping and SSH) from internet
 ## And EC2 can initiate traffic to internet (curl...)
@@ -180,6 +187,12 @@ resource "aws_instance" "public-ec2" {
 
 output "cpu-203-ec2-1-public-ip" {
   value = aws_instance.public-ec2.public_ip
+}
+output "cpu-203-ec2-1-id" {
+  value = aws_instance.public-ec2.id
+}
+output "cpu-203-s3-arn" {
+  value = aws_s3_bucket.s3-bucket-1-203.arn
 }
 output "cpu-203-sg-id" {
   value = aws_security_group.sg-203.id
