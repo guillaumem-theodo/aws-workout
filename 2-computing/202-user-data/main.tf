@@ -110,7 +110,7 @@ resource "aws_route_table_association" "rt-association-subnet1-202" {
 }
 
 ## Create a SECURITY GROUP associated to the VPC
-## The SG allows all incoming PORT 80 traffic from your IP
+## The SG allows all incoming PORT 80 traffic from everywhere
 ## The SG allows all incoming PORT 22 traffic from your IP
 ## The SG allows all incoming PORT ICMP (ping) traffic from your IP
 
@@ -128,7 +128,7 @@ resource "aws_security_group" "sg-202" {
     from_port = 80
     protocol = "tcp"
     to_port = 80
-    cidr_blocks = ["${module.myip.address}/32" ]
+    cidr_blocks = ["0.0.0.0/0" ]
   }
   ingress {
     from_port = -1
