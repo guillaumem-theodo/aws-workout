@@ -1,48 +1,7 @@
-## USE S3 BUCKET TO STORE TERRAFORM STATE
-terraform {
-  backend "s3" {
-  }
-}
-
-########################################################################################################################
-## INPUTS
-########################################################################################################################
-## NAME OF THE TUTORIAL
-variable "dojo" {
-  type = string
-  default = "aws-workout"
-}
-## REGION WHERE THE AWS COMPONENTS WILL BE DEPLOYED
-variable "region" {
-  type = string
-  default = "eu-west-2"
-}
-
-## REGION OF THE S3 BUCKET USED TO STORE TERRAFORM STATES
-variable "tf-s3-region" {
-  type = string
-  default = "eu-west-2"
-}
-
-## NAME OF THE S3 BUCKET USED TO STORE TERRAFORM STATES
-variable "tf-s3-bucket" {
-  type = string
-}
-
 ########################################################################################################################
 provider "aws" {
   region = var.region
   profile = "aws-workout"
-}
-
-data "aws_ami" "amazon-linux" {
-  owners = ["amazon"]
-  most_recent = true
-
-  filter {
-    name   = "name"
-    values = ["amzn2-ami-hvm-*-x86_64-gp2"]
-  }
 }
 
 data "aws_iam_policy" "S2ReadOnlyAccess" {
@@ -58,11 +17,11 @@ data "terraform_remote_state" "subnets-102" {
   }
 }
 
-data "terraform_remote_state" "cpu-203" {
+data "terraform_remote_state" "cpu-202" {
   backend = "s3"
   config = {
     bucket = var.tf-s3-bucket
-    key = "203-meta-data"
+    key = "202-user-data"
     region = var.tf-s3-region
   }
 }
@@ -87,7 +46,7 @@ EOF
   tags = {
     Purpose: var.dojo
     Name: "cpu-204-iam-role-1"
-    Description: "A role for the EC2"
+    Description: "A role for the EC2 that allows the EC2 to assume some roles on your behalf"
   }
 }
 
@@ -111,13 +70,13 @@ resource "aws_instance" "public-ec2-2" {
   instance_type = "t2.micro"
   associate_public_ip_address = true
   subnet_id = data.terraform_remote_state.subnets-102.outputs.net-102-subnet-1-id
-  security_groups = [data.terraform_remote_state.cpu-203.outputs.cpu-203-sg-id]
+  security_groups = [data.terraform_remote_state.cpu-202.outputs.cpu-202-sg-id]
   key_name = "aws-workout-key"
   iam_instance_profile = aws_iam_instance_profile.instance-profile.id
 
   tags = {
     Purpose: var.dojo
     Name: "cpu-204-ec2-1"
-    Description: "EC2 in a subnet with a route and a security group (in first subnet)"
+    Description: "EC2 that can perform actions (read-only S3 actions) on your behalf"
   }
 }

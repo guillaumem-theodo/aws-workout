@@ -16,4 +16,6 @@ S3_KEY_CMD="key=$TUTORIAL_KEY"
 PROFILE_CMD="profile=aws-workout"
 
 echo "Using Terraform backend in S3 bucket $S3_BUCKET_CMD located in $REGION_CMD"
+(rm -f "$1/common_vars.tf")
+(cd "$1" || exit; ln -s ../../common/variables.tf common_vars.tf)
 (cd "$1" || exit; terraform init -backend-config="$REGION_CMD" -backend-config="$S3_BUCKET_CMD" -backend-config="$S3_KEY_CMD" -backend-config="$PROFILE_CMD")

@@ -1,58 +1,16 @@
-## USE S3 BUCKET TO STORE TERRAFORM STATE
-terraform {
-  backend "s3" {
-  }
-}
-
-########################################################################################################################
-## INPUTS
-########################################################################################################################
-## NAME OF THE TUTORIAL
-variable "dojo" {
-  type = string
-  default = "aws-workout"
-}
-## REGION WHERE THE AWS COMPONENTS WILL BE DEPLOYED
-variable "region" {
-  type = string
-  default = "eu-west-2"
-}
-
-## REGION OF THE S3 BUCKET USED TO STORE TERRAFORM STATES
-variable "tf-s3-region" {
-  type = string
-  default = "eu-west-2"
-}
-
-## NAME OF THE S3 BUCKET USED TO STORE TERRAFORM STATES
-variable "tf-s3-bucket" {
-  type = string
-}
-
 ########################################################################################################################
 provider "aws" {
   region = var.region
   profile = "aws-workout"
 }
 
-data "aws_ami" "amazon-linux" {
-  owners = ["amazon"]
-  most_recent = true
-
-  filter {
-    name   = "name"
-    values = ["amzn2-ami-hvm-*-x86_64-gp2"]
-  }
-}
-data "aws_availability_zones" "all" {}
-
 ######################################################################################
 ## Create four VPCs with DNS settings
 ## 1) create three new  VPC with AWS DNS enabled
 ## 2) create EC2 in each VPC
-## 3) change route
+## 3) change routes in route tables
 ## 4) test visibility of EC2 from each other
-## 5) check transitivity
+## 5) check transitivity (VPC peering IS NOT transitive)
 
 resource "aws_vpc" "net-109-vpc-1" {
   cidr_block = "10.0.0.0/16"

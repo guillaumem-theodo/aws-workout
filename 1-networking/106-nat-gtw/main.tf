@@ -1,34 +1,3 @@
-## USE S3 BUCKET TO STORE TERRAFORM STATE
-terraform {
-  backend "s3" {
-  }
-}
-
-########################################################################################################################
-## INPUTS
-########################################################################################################################
-## NAME OF THE TUTORIAL
-variable "dojo" {
-  type = string
-  default = "aws-workout"
-}
-## REGION WHERE THE AWS COMPONENTS WILL BE DEPLOYED
-variable "region" {
-  type = string
-  default = "eu-west-2"
-}
-
-## REGION OF THE S3 BUCKET USED TO STORE TERRAFORM STATES
-variable "tf-s3-region" {
-  type = string
-  default = "eu-west-2"
-}
-
-## NAME OF THE S3 BUCKET USED TO STORE TERRAFORM STATES
-variable "tf-s3-bucket" {
-  type = string
-}
-
 ########################################################################################################################
 provider "aws" {
   region = var.region
@@ -59,7 +28,6 @@ data "terraform_remote_state" "bastion-105" {
     region = var.tf-s3-region
   }
 }
-
 
 ######################################################################################
 ## Add a NAT GATEWAY to allow private EC2 to initiate traffic TO internet (ONE WAY)

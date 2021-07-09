@@ -1,34 +1,3 @@
-## USE S3 BUCKET TO STORE TERRAFORM STATE
-terraform {
-  backend "s3" {
-  }
-}
-
-########################################################################################################################
-## INPUTS
-########################################################################################################################
-## NAME OF THE TUTORIAL
-variable "dojo" {
-  type = string
-  default = "aws-workout"
-}
-## REGION WHERE THE AWS COMPONENTS WILL BE DEPLOYED
-variable "region" {
-  type = string
-  default = "eu-west-2"
-}
-
-## REGION OF THE S3 BUCKET USED TO STORE TERRAFORM STATES
-variable "tf-s3-region" {
-  type = string
-  default = "eu-west-2"
-}
-
-## NAME OF THE S3 BUCKET USED TO STORE TERRAFORM STATES
-variable "tf-s3-bucket" {
-  type = string
-}
-
 ########################################################################################################################
 provider "aws" {
   region = var.region
@@ -52,15 +21,6 @@ data "terraform_remote_state" "subnets-102" {
   }
 }
 
-data "aws_ami" "amazon-linux" {
-  owners = ["amazon"]
-  most_recent = true
-
-  filter {
-    name   = "name"
-    values = ["amzn2-ami-hvm-*-x86_64-gp2"]
-  }
-}
 ######################################################################################
 ## Create an access FROM and TO internet on our EC2 (public EC2)
 ## 1) create an internet gateway (IGW)

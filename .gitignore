@@ -4,3 +4,4 @@ node_modules
 .terraform.lock.hcl
 *.pem
 *.pub
+common_vars.tf

@@ -72,6 +72,10 @@ First initialize the Terraform state for the Workout Step (in the Workout Root d
 ...
 ``` 
 
+NB: The `init-tutorial.sh` command creates a SYMLINK from `common\variables.tf` directory inside the workout step directory.
+This way, the `main.tf` Terraform file can **inherits** variables and data (and thus reduce the complexity of the file).
+
+
 Then, apply the Terraform plan on your AWS account 
 
 ```shell
