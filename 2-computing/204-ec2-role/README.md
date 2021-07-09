@@ -4,7 +4,7 @@
 
 1) Create an 👉 **IAM Role** named `cpu-204-iam-role-1`
 
-2) Attach an 👉 ** IAM Policy ** allowing **S3 read only commands** to the previously created role. The policy already exists in the catalaog of predefined AWS policies. The name of the policy is `AmazonS3ReadOnlyAccess`
+2) Attach an 👉 **IAM Policy** allowing **S3 read only commands** to the previously created role. The policy already exists in the catalaog of predefined AWS policies. The name of the policy is `AmazonS3ReadOnlyAccess`
 
 3) Attach the **Role** to a new EC2
 
