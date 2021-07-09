@@ -14,7 +14,6 @@ resource "aws_launch_template" "launch-template-206" {
   }
 
   tags = {
-    Name: "cpu-206-launch-template"
     Purpose: var.dojo
   }
 }
