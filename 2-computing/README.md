@@ -6,3 +6,4 @@
 - [204-ec2-role](./204-ec2-role) : Understand 👉 **Role attached to EC2**. Allowing EC2 to perform actions on your behalf 
 - [205-alb](./205-alb): 👉 Automatic Load Balancer. Balance the traffic between multiple EC2 workers
 - [206-auto-scaling](./206-auto-scaling): 👉 Auto Scaling Group. Automatically scale up/down the number of EC2 workers behind the ALB
+- [207-simple-ecs](./207-simple-ECS): 👉 ECS. Deploy Docker images on a managed Kub Cluster (Fargate)
