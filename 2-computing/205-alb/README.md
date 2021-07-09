@@ -55,10 +55,6 @@ You can create:
 - a `workers.tf` file with the EC2
 
 
-
-
-
-
 ![Image of VPC](./doc/205-alb.png)
 
 
