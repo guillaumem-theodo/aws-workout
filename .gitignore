@@ -5,3 +5,8 @@ node_modules
 *.pem
 *.pub
 common_vars.tf
+jspm_packages
+.serverless
+.webpack
+.idea
+.idea/*
