@@ -14,6 +14,7 @@ REGION_CMD="region=$S3_BUCKET_REGION"
 S3_BUCKET_CMD="bucket=$S3_BUCKET"
 S3_KEY_CMD="key=$TUTORIAL_KEY"
 PROFILE_CMD="profile=aws-workout"
+export AWS_PROFILE="aws-workout"
 
 echo "Using Terraform backend in S3 bucket $S3_BUCKET_CMD located in $REGION_CMD"
 (rm -f "$1/common_vars.tf")

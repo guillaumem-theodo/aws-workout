@@ -26,6 +26,10 @@ and so on...
 Some steps rely on previous steps. In each directory, the `dep.txt` file lists the required dependencies. 
 The shell commands to apply Terraform or Cloudformation stacks verify automatically the required dependencies.
 
+### Pre-requisites
+
+- Install ``jq`` : https://stedolan.github.io/jq/tutorial/
+
 ### 🚀 How to apply Workouts ? 🚀 
 
 You can execute Workouts with two modes:

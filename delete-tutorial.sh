@@ -13,6 +13,7 @@ source ./backend-env.conf
 TF_S3_REGION_VAR="tf-s3-region=$S3_BUCKET_REGION"
 TF_S3_BUCKET_VAR="tf-s3-bucket=$S3_BUCKET"
 TUTORIAL_REGION_VAR="region=$TUTORIAL_REGION"
+export AWS_PROFILE="aws-workout"
 
 echo "Deleting Tutorial '$TUTORIAL_KEY' Terraform in $TUTORIAL_REGION_VAR"
 (cd "$1" || exit; terraform destroy -auto-approve -var "$TUTORIAL_REGION_VAR"  -var "$TF_S3_REGION_VAR" -var "$TF_S3_BUCKET_VAR")
