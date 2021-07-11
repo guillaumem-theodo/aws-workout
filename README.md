@@ -1,10 +1,6 @@
 # 👨‍🎓 AWS Workout 👨‍🎓
 ## Small and Quick Hands-on on AWS basic principles ##
 
-### 🚀 Set up your AWS profile 🚀 
-First follow [this documentation](./doc/install-aws.md) to set up a `aws-workout` AWS profile on your computer.
-All shell commands provided in these tutorials require this profile.
-
 ### 🏛 Tutorials organisation 🏛 
 
 We have grouped Workout Steps by knowledge categories:
@@ -24,43 +20,89 @@ In each knowledge area, we have ordered the Workout steps by difficulty. Example
 and so on...
 
 Some steps rely on previous steps. In each directory, the `dep.txt` file lists the required dependencies. 
-The shell commands to apply Terraform or Cloudformation stacks verify automatically the required dependencies.
+The shell commands to apply Terraform or Cloudformation stacks verify automatically the required dependencies. 
+You will be prompted if a dependant workout has not been deployed.
 
 ### Pre-requisites
 
 - Install ``jq`` : https://stedolan.github.io/jq/tutorial/
+- Install ``AWS CLI`` : https://docs.aws.amazon.com/cli/latest/userguide/cli-chap-install.html 
+- Install ``Terraform`` : https://learn.hashicorp.com/tutorials/terraform/install-cli
+- Install ``Serverless Framework`` : https://www.serverless.com/framework/docs/getting-started
 
-### 🚀 How to apply Workouts ? 🚀 
+All workouts have been tested with:
+- AWS CLI **1.17.2** or AWS CLI **2.2.10**
+- Terraform **1.0.1** or Terraform **1.0.2**
+- Serverless Framework **2.3.0**
+- Mac OS 10.15
+- Ubuntu 20.04 LTS
 
-You can execute Workouts with two modes:
-- **Terraform**: you will learn **Terraform** while learning AWS [intro terraform](https://www.terraform.io/intro/index.html)
-- **AWS CloudFormation**: you will learn **CloudFormation** while learning AWS [intro cloudformation](https://aws.amazon.com/fr/cloudformation/getting-started/)
+### 🚀 Set up your AWS profile 🚀 
+First follow [this documentation](./doc/install-aws.md) to set up a `aws-workout` AWS profile on your computer.
+All shell commands provided in these tutorials require this profile.
+
+### 🚀 How to perform Workouts ? 🚀 
+
+You can perform Workouts with two modes:
+- **Terraform**: you will see basics of **Terraform** while learning AWS [intro terraform](https://www.terraform.io/intro/index.html)
+- **AWS CloudFormation**: you will see basics of **CloudFormation** while learning AWS [intro cloudformation](https://aws.amazon.com/fr/cloudformation/getting-started/)
   
-It's your choice...
+These workouts do not intend to show **Terraform** or **CloudFormation** best practices. 
 
-There are very tiny differences between the two modes. 
+There are very tiny differences between the two modes:
+- some workouts require components/services deployed in multiple regions. Terraform supports multi-region Stacks, whereas CloudFormation requires one stack per region.
+- Terraform allows modifying default objects (routes...) whereas CloudFormation does not.
 
 ⚠️ But YOU CAN NOT SWITCH FROM TERRAFORM TO CLOUDFORMATION (or reverse) ⚠️
 - **Terraform** Workouts may require states from the previous ones (stored in S3 bucket). 
 - **Cloudformation** Workouts may require Stack outputs from previous ones (stored in AWS CloudFormation Stacks). ️
 
 ### 🔑🔑 Create a Key Pair for your EC2 🔑🔑
-In order to work with and to log into the EC2, you need to create a keypair.
-A key pair is a pair of private and public key.
-You will need to have the private key on your laptop.
+In order to work with and to log into the EC2, you need to create an SSH keypair.
+A key pair is a pair of private and public keys.
+You will need to have the private key stored on your laptop (in the Workout root directory).
 The public key need to be stored in AWS EC2 KeyPair Service.
 
-🚧 Howto to create and store the keypair:
+#### 🚧 Howto to create and store the keypair:
 In the Workout root directory 
   
 ```shell
 ./generate-keypair.sh
 ```
 
-It will create a keypair in AWS named `aws-workout-key`
-It will create the private and public key
+It will generate the private and public key files
   - private key file named `aws-workout-key-pair.pem`. Must be stored on your laptop in the Workout root directory.
-  - public key file named `aws-workout-key-pair.pub`. Will be automatically uploaded in AWS.
+  - public key file named `aws-workout-key-pair.pub`. Will be automatically uploaded in AWS. 
+
+It will create a keypair in AWS named `aws-workout-key` and upload the public part of the key from your laptop.
+
+#### 🚧 Enable SSH Agent Forwarding
+
+Many TEST files rely on SSH and SSH Agent Forwarding (from your laptop to EC2 then to other EC2). 
+Agent Forwarding is a way to SSH from servers to servers using the same credentials.
+You need to enable **SSH Agent Forwarding** and to add the private key.
+
+⚠️ SSH Agent Forwarding is not a good practice on PROD environments.
+
+1) Enable SSH Agent Forwarding
+```bash
+vim ~/.ssh/config
+
+Add:
+Host *
+  ForwardAgent yes
+  AddKeysToAgent yes
+```
+
+2) Add the private key in agent forwarding
+```bash
+ssh-add -k aws-workout-key-pair.pem
+```
+
+2) You can check if the agent fowarding is set up using following command
+```bash
+ssh-add -L
+```
 
 ### Terraform Workouts 
 If you want to use TERRAFORM versions, please install [Terraform CLI](./doc/install-terraform.md). 
