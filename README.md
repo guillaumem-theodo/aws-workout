@@ -155,9 +155,9 @@ Otherwise, you will 💸💸💸 **PAY** 💸💸💸 for unused components or s
 #### 🚧 To apply a CloudFormation Workout:
 Apply the CloudFormation stack using the following command:
 ```shell
-./run-cf-tutorial.sh xxxx
-./run-cf-tutorial.sh ./1-networking/101-basic-vpc
-./run-cf-tutorial.sh ./1-networking/102-basic-subnets
+./cf-run-tutorial.sh xxxx
+./cf-run-tutorial.sh ./1-networking/101-basic-vpc
+./cf-run-tutorial.sh ./1-networking/102-basic-subnets
 ...
 ```
 
@@ -176,9 +176,9 @@ Once the components have been properly created in AWS, you can test some asserti
 At the end of the workout step, and if the step is not required for the next ones, you should delete the created AWS components.
 Otherwise, you will 💸💸💸 **PAY** 💸💸💸 for unused components or services.
 ```shell
-./delete-cf-tutorial.sh xxx
-./delete-cf-tutorial.sh ./1-networking/102-basic-subnet
-./delete-cf-tutorial.sh ./1-networking/101-basic-vpc
+./cf-delete-tutorial.sh xxx
+./cf-delete-tutorial.sh ./1-networking/102-basic-subnet
+./cf-delete-tutorial.sh ./1-networking/101-basic-vpc
 ...
 ```
 

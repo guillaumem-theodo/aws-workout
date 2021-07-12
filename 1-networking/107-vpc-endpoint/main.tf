@@ -6,7 +6,7 @@ provider "aws" {
 
 provider "aws" {
   alias = "another-region"
-  region = "us-east-1"
+  region = var.another-region
   profile = "aws-workout"
 }
 

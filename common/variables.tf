@@ -19,6 +19,12 @@ variable "region" {
   default = "eu-west-2"
 }
 
+## ANOTHER REGION WHERE THE AWS COMPONENTS WILL BE DEPLOYED if TWO REGIONS ARE REQUIRED
+variable "another-region" {
+  type = string
+  default = "us-east-1"
+}
+
 ## REGION OF THE S3 BUCKET USED TO STORE TERRAFORM STATES
 variable "tf-s3-region" {
   type = string
