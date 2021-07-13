@@ -37,6 +37,16 @@ All workouts have been tested with:
 - Mac OS 10.15
 - Ubuntu 20.04 LTS
 
+## DISCLAIMER 
+
+🔥🔥🔥   All these workouts execute on **YOUR AWS account**. Many of these workouts induce costs.
+
+🔥🔥🔥   You are responsible to delete workouts and/or created resources, services or components at the end of the workout.
+Otherwise, AWS will bill you...
+
+🔥🔥🔥   We highly suggest you creating a budget and alerting in your AWS account.
+
+## LET'S START
 ### 🚀 Set up your AWS profile 🚀 
 First follow [this documentation](./doc/install-aws.md) to set up a `aws-workout` AWS profile on your computer.
 All shell commands provided in these tutorials require this profile.
