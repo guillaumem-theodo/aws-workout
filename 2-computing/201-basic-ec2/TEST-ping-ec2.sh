@@ -8,4 +8,8 @@ echo "✅ Test Port 80 EC2 created in Tutorial 201 with public IP: $ec2_1_public
 nc -vz "$ec2_1_public_ip" 80
 
 echo "❌ Test Port 443 EC2 created in Tutorial 201 with public IP: $ec2_1_public_ip SHOULD TIMEOUT in 10s"
-nc -v -z -w 10 -G 10 "$ec2_1_public_ip" 443
+additional_timeout=""
+if [[ $OSTYPE == 'darwin'* ]]; then
+  additional_timeout="-G 10"
+fi
+nc -v -z -w 10 "$additional_timeout" "$ec2_1_public_ip" 443
