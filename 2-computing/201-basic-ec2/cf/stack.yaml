@@ -1,0 +1,169 @@
+---
+  AWSTemplateFormatVersion: "2010-09-09"
+  Parameters:
+    dojo:
+      Type: String
+      Default: 'aws-workout'
+    LatestAmiId:
+      Type: 'AWS::SSM::Parameter::Value<AWS::EC2::Image::Id>'
+      Default: '/aws/service/ami-amazon-linux-latest/amzn2-ami-hvm-x86_64-gp2'
+
+  Resources:
+
+# Create two VPCs (one with DNS enabled, the other without)
+    Net108Vpc1:
+      Type: "AWS::EC2::VPC"
+      Properties:
+        CidrBlock: "10.100.0.0/16"
+        EnableDnsHostnames: true
+        EnableDnsSupport: true
+        Tags:
+          -
+            Key: "Purpose"
+            Value: !Ref dojo
+          -
+            Key: "Name"
+            Value: 'net-108-vpc-1'
+          -
+            Key: "Description"
+            Value: !Sub 'A First VPC with DNS enabled in ${AWS::Region} Region'
+
+    Net108Vpc2:
+      Type: "AWS::EC2::VPC"
+      Properties:
+        CidrBlock: "10.200.0.0/16"
+        EnableDnsHostnames: false
+        EnableDnsSupport: false
+        Tags:
+          -
+            Key: "Purpose"
+            Value: !Ref dojo
+          -
+            Key: "Name"
+            Value: 'net-108-vpc-2'
+          -
+            Key: "Description"
+            Value: !Sub 'A Second VPC with DNS disabled in ${AWS::Region} Region'
+
+# Create one subnet in each VPC
+    Subnet1:
+      Type: "AWS::EC2::Subnet"
+      Properties:
+        VpcId: !Ref Net108Vpc1
+        AvailabilityZone:
+          Fn::Sub: "${AWS::Region}a"
+        CidrBlock: "10.100.0.0/24"
+        Tags:
+          -
+            Key: "Purpose"
+            Value: !Ref dojo
+          -
+            Key: "Name"
+            Value: 'net-108-subnet-1'
+    Subnet2:
+      Type: "AWS::EC2::Subnet"
+      Properties:
+        VpcId: !Ref Net108Vpc2
+        AvailabilityZone:
+          Fn::Sub: "${AWS::Region}a"
+        CidrBlock: "10.200.0.0/24"
+        Tags:
+          -
+            Key: "Purpose"
+            Value: !Ref dojo
+          -
+            Key: "Name"
+            Value: 'net-108-subnet-2'
+
+# Give access from internet for SSH in Subnet 1
+    IGW:
+      Type: AWS::EC2::InternetGateway
+      Properties:
+        Tags:
+          - Key: "Name"
+            Value: "net-108-igw"
+          - Key: "Purpose"
+            Value: !Ref dojo
+
+    IGWAttachment:
+      Type: AWS::EC2::VPCGatewayAttachment
+      Properties:
+        InternetGatewayId: !Ref IGW
+        VpcId: !Ref Net108Vpc1
+
+    Net108RouteTable:
+      Type: AWS::EC2::RouteTable
+      DependsOn: IGWAttachment
+      Properties:
+        VpcId: !Ref Net108Vpc1
+        Tags:
+          - Key: "Name"
+            Value: "net-108-rt"
+          - Key: "Purpose"
+            Value: !Ref dojo
+
+    RouteToInternet:
+      Type: AWS::EC2::Route
+      DependsOn: IGW
+      Properties:
+         RouteTableId: !Ref Net108RouteTable
+         DestinationCidrBlock: 0.0.0.0/0
+         GatewayId: !Ref IGW
+
+    RTSubnetAssociation:
+      Type: AWS::EC2::SubnetRouteTableAssociation
+      Properties:
+        RouteTableId: !Ref Net108RouteTable
+        SubnetId: !Ref Subnet1
+
+    Net108SecurityGroup:
+      Type: AWS::EC2::SecurityGroup
+      Properties:
+        VpcId: !Ref Net108Vpc1
+        GroupDescription: "Security group for net-108 dojo"
+        SecurityGroupIngress:
+        - IpProtocol: tcp
+          FromPort: 22
+          ToPort: 22
+          CidrIp: 0.0.0.0/0
+        Tags:
+          - Key: "Name"
+            Value: "net-108-sg"
+          - Key: "Purpose"
+            Value: !Ref dojo
+
+  # Create one EC2 in each subnet
+    EC2Number1:
+      Type: AWS::EC2::Instance
+      Properties:
+        InstanceType: 't2.micro'
+        KeyName: 'aws-workout-key'
+        ImageId: !Ref LatestAmiId
+        NetworkInterfaces:
+          - AssociatePublicIpAddress: "true"
+            DeviceIndex: "0"
+            GroupSet:
+              - !Ref Net108SecurityGroup
+            SubnetId: !Ref Subnet1
+        Tags:
+          - Key: "Name"
+            Value: "net-108-ec2-1"
+          - Key: "Purpose"
+            Value: !Ref dojo
+
+    EC2Number2:
+      Type: AWS::EC2::Instance
+      Properties:
+        InstanceType: 't2.micro'
+        KeyName: 'aws-workout-key'
+        ImageId: !Ref LatestAmiId
+        NetworkInterfaces:
+          - AssociatePublicIpAddress: "false"
+            DeviceIndex: "0"
+            SubnetId: !Ref Subnet2
+        Tags:
+          - Key: "Name"
+            Value: "net-108-ec2-2"
+          - Key: "Purpose"
+            Value: !Ref dojo
+
