@@ -9,79 +9,13 @@
       Default: '/aws/service/ami-amazon-linux-latest/amzn2-ami-hvm-x86_64-gp2'
 
   Resources:
-
-# Create two VPCs (one with DNS enabled, the other without)
-    Net108Vpc1:
-      Type: "AWS::EC2::VPC"
-      Properties:
-        CidrBlock: "10.100.0.0/16"
-        EnableDnsHostnames: true
-        EnableDnsSupport: true
-        Tags:
-          -
-            Key: "Purpose"
-            Value: !Ref dojo
-          -
-            Key: "Name"
-            Value: 'net-108-vpc-1'
-          -
-            Key: "Description"
-            Value: !Sub 'A First VPC with DNS enabled in ${AWS::Region} Region'
-
-    Net108Vpc2:
-      Type: "AWS::EC2::VPC"
-      Properties:
-        CidrBlock: "10.200.0.0/16"
-        EnableDnsHostnames: false
-        EnableDnsSupport: false
-        Tags:
-          -
-            Key: "Purpose"
-            Value: !Ref dojo
-          -
-            Key: "Name"
-            Value: 'net-108-vpc-2'
-          -
-            Key: "Description"
-            Value: !Sub 'A Second VPC with DNS disabled in ${AWS::Region} Region'
-
-# Create one subnet in each VPC
-    Subnet1:
-      Type: "AWS::EC2::Subnet"
-      Properties:
-        VpcId: !Ref Net108Vpc1
-        AvailabilityZone:
-          Fn::Sub: "${AWS::Region}a"
-        CidrBlock: "10.100.0.0/24"
-        Tags:
-          -
-            Key: "Purpose"
-            Value: !Ref dojo
-          -
-            Key: "Name"
-            Value: 'net-108-subnet-1'
-    Subnet2:
-      Type: "AWS::EC2::Subnet"
-      Properties:
-        VpcId: !Ref Net108Vpc2
-        AvailabilityZone:
-          Fn::Sub: "${AWS::Region}a"
-        CidrBlock: "10.200.0.0/24"
-        Tags:
-          -
-            Key: "Purpose"
-            Value: !Ref dojo
-          -
-            Key: "Name"
-            Value: 'net-108-subnet-2'
-
 # Give access from internet for SSH in Subnet 1
     IGW:
       Type: AWS::EC2::InternetGateway
       Properties:
         Tags:
           - Key: "Name"
-            Value: "net-108-igw"
+            Value: "cpu-201-igw"
           - Key: "Purpose"
             Value: !Ref dojo
 
@@ -89,16 +23,16 @@
       Type: AWS::EC2::VPCGatewayAttachment
       Properties:
         InternetGatewayId: !Ref IGW
-        VpcId: !Ref Net108Vpc1
+        VpcId: {"Fn::ImportValue" : "net-101-vpc-id"}
 
     Net108RouteTable:
       Type: AWS::EC2::RouteTable
       DependsOn: IGWAttachment
       Properties:
-        VpcId: !Ref Net108Vpc1
+        VpcId: {"Fn::ImportValue" : "net-101-vpc-id"}
         Tags:
           - Key: "Name"
-            Value: "net-108-rt"
+            Value: "cpu-201-rt"
           - Key: "Purpose"
             Value: !Ref dojo
 
@@ -114,21 +48,34 @@
       Type: AWS::EC2::SubnetRouteTableAssociation
       Properties:
         RouteTableId: !Ref Net108RouteTable
-        SubnetId: !Ref Subnet1
+        SubnetId: {"Fn::ImportValue" : "net-102-subnet-1-id"}
 
     Net108SecurityGroup:
       Type: AWS::EC2::SecurityGroup
       Properties:
-        VpcId: !Ref Net108Vpc1
-        GroupDescription: "Security group for net-108 dojo"
+        VpcId: {"Fn::ImportValue" : "net-101-vpc-id"}
+        GroupDescription: "Security group for cpu-201 dojo"
         SecurityGroupIngress:
         - IpProtocol: tcp
           FromPort: 22
           ToPort: 22
           CidrIp: 0.0.0.0/0
+        - IpProtocol: tcp
+          FromPort: 80
+          ToPort: 80
+          CidrIp: 0.0.0.0/0
+        - IpProtocol: icmp
+          FromPort: -1
+          ToPort: -1
+          CidrIp: 0.0.0.0/0
+        SecurityGroupEgress:
+          - IpProtocol: -1
+            FromPort: 0
+            ToPort: 0
+            CidrIp: 0.0.0.0/0
         Tags:
           - Key: "Name"
-            Value: "net-108-sg"
+            Value: "cpu-201-sg"
           - Key: "Purpose"
             Value: !Ref dojo
 
@@ -144,26 +91,9 @@
             DeviceIndex: "0"
             GroupSet:
               - !Ref Net108SecurityGroup
-            SubnetId: !Ref Subnet1
+            SubnetId: { "Fn::ImportValue": "net-102-subnet-1-id" }
         Tags:
           - Key: "Name"
-            Value: "net-108-ec2-1"
+            Value: "cpu-201-ec2-1"
           - Key: "Purpose"
             Value: !Ref dojo
-
-    EC2Number2:
-      Type: AWS::EC2::Instance
-      Properties:
-        InstanceType: 't2.micro'
-        KeyName: 'aws-workout-key'
-        ImageId: !Ref LatestAmiId
-        NetworkInterfaces:
-          - AssociatePublicIpAddress: "false"
-            DeviceIndex: "0"
-            SubnetId: !Ref Subnet2
-        Tags:
-          - Key: "Name"
-            Value: "net-108-ec2-2"
-          - Key: "Purpose"
-            Value: !Ref dojo
-
