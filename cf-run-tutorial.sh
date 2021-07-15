@@ -32,7 +32,7 @@ if [ -f "$1"/dep.txt ]; then
 fi
 
 echo "Applying CloudFormation Tutorial '$TUTORIAL_KEY' in $TUTORIAL_REGION"
-(cd "$1"/cf || exit; aws cloudformation create-stack --stack-name "$TUTORIAL_KEY" --region "$TUTORIAL_REGION" --profile aws-workout --template-body file://./stack.yaml)
+(cd "$1"/cf || exit; aws cloudformation create-stack --stack-name "$TUTORIAL_KEY" --region "$TUTORIAL_REGION" --profile aws-workout --capabilities CAPABILITY_NAMED_IAM --template-body file://./stack.yaml)
 
 if [ -f "$1"/cf/stack_additional.yaml ]; then
   echo "Adding an additional stack in another region ($TUTORIAL_ANOTHER_REGION)";
