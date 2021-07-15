@@ -50,7 +50,7 @@
         RouteTableId: !Ref Net108RouteTable
         SubnetId: {"Fn::ImportValue" : "net-102-subnet-1-id"}
 
-    Net108SecurityGroup:
+    Cpu202SecurityGroup:
       Type: AWS::EC2::SecurityGroup
       Properties:
         VpcId: {"Fn::ImportValue" : "net-101-vpc-id"}
@@ -90,7 +90,7 @@
           - AssociatePublicIpAddress: "true"
             DeviceIndex: "0"
             GroupSet:
-              - !Ref Net108SecurityGroup
+              - !Ref Cpu202SecurityGroup
             SubnetId: { "Fn::ImportValue": "net-102-subnet-1-id" }
         "UserData": {
           "Fn::Base64": {
@@ -111,3 +111,9 @@
             Value: "cpu-202-ec2-1"
           - Key: "Purpose"
             Value: !Ref dojo
+
+  Outputs:
+    cpu208SecurityGroup:
+      Value: !Ref Cpu202SecurityGroup
+      Export:
+        Name: 'cpu-208-security-group-id'
