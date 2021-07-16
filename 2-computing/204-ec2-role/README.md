@@ -8,9 +8,10 @@ So, for example, the EC2 is not allowed to list the bucket content (even if the 
 In order to give actions rights to the EC2, we need to create **an IAM Role** that will be associated to the EC2.
 The Role will be associated with **policies**. Policies describe what is possible to do.
 
-There are two types of policies:
+There are three types of policies:
 - AWS Managed ones (predefined classical policies)
-- Inline ones (defined on your own)
+- Customer managed ones (reusable)  
+- Inline ones (defined on your own directly in the role)
 
 👉 From the `203-meta-data` workout
 
