@@ -6,7 +6,7 @@
 We have grouped Workout Steps by knowledge categories:
 - Networking: [1-networking](./1-networking)   (VPC, subnets, security groups, peering, dns)
 - Computing: [2-computing](./2-computing)  (EC2, ECS, Lambdas, ALB, Auto-scaling)
-- Storing: 🕰 Soon...stay tuned (S3, RDS, Dynamodb)
+- Storing: [3-storing](./3-storing)  (S3, RDS, Dynamodb)
 - Protecting: 🕰 Soon...stay tuned (KMS, S3, ACM)
 - Publishing: 🕰 Soon...stay tuned (CloudFront, pre-signed URL, OAI)
 - Monitoring: 🕰 Soon...stay tuned (CloudWatch, CloudTrail, FlowLogs)

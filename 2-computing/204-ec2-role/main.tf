@@ -4,10 +4,6 @@ provider "aws" {
   profile = "aws-workout"
 }
 
-data "aws_iam_policy" "S2ReadOnlyAccess" {
-  arn = "arn:aws:iam::aws:policy/AmazonS3ReadOnlyAccess"
-}
-
 data "terraform_remote_state" "subnets-102" {
   backend = "s3"
   config = {
