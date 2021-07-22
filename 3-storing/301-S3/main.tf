@@ -87,3 +87,39 @@ resource "aws_s3_bucket_object" "s3-bucket-object-4-301" {
   source = "fixtures/file3.txt"
   etag = filemd5("fixtures/file3.txt")
 }
+
+resource "aws_s3_bucket_object" "s3-bucket-object-5-301" {
+  bucket = aws_s3_bucket.s3-bucket-3-301.bucket
+  key    = "my-key-3"
+  source = "fixtures/file3.txt"
+  etag = filemd5("fixtures/file3.txt")
+}
+
+########################################################################################################################
+## OUTPUTS FOR FOLLOWING TUTORIALS
+########################################################################################################################
+output "sto-301-bucket-1-id" {
+  value = aws_s3_bucket.s3-bucket-1-301.id
+}
+output "sto-301-bucket-2-id" {
+  value = aws_s3_bucket.s3-bucket-2-301.id
+}
+output "sto-301-bucket-3-id" {
+  value = aws_s3_bucket.s3-bucket-3-301.id
+}
+output "sto-301-bucket-4-id" {
+  value = aws_s3_bucket.s3-bucket-4-301.id
+}
+
+output "sto-301-bucket-1-arn" {
+  value = aws_s3_bucket.s3-bucket-1-301.arn
+}
+output "sto-301-bucket-2-arn" {
+  value = aws_s3_bucket.s3-bucket-2-301.arn
+}
+output "sto-301-bucket-3-arn" {
+  value = aws_s3_bucket.s3-bucket-3-301.arn
+}
+output "sto-301-bucket-4-arn" {
+  value = aws_s3_bucket.s3-bucket-4-301.arn
+}
