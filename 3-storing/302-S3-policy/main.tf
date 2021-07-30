@@ -40,7 +40,7 @@ data "aws_iam_user" "second-user" {
   user_name = "aws-workout-second-user"
 }
 
-resource "aws_vpc_endpoint" "vpc-endpoint-1-107" {
+resource "aws_vpc_endpoint" "vpc-endpoint-1-302" {
   vpc_id = data.terraform_remote_state.vpc-101.outputs.net-101-vpc-id
   service_name = "com.amazonaws.${var.region}.s3"
   route_table_ids = [aws_route_table.route-table-302-1.id]
@@ -146,7 +146,7 @@ resource "aws_s3_bucket_policy" "s3-policy-sto-302-3" {
         ]
         Condition = {
             "StringNotEquals": {
-              "aws:SourceVpce": aws_vpc_endpoint.vpc-endpoint-1-107.id
+              "aws:SourceVpce": aws_vpc_endpoint.vpc-endpoint-1-302.id
             }
         }
       },
