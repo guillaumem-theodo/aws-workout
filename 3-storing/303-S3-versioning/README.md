@@ -14,6 +14,16 @@
 🏁 Test S3 versioning
 
 - ✅ List objects and versions in a Given S3 bucket
+  
+```bash
+aws s3 ls s3://BUCKETNAME/KEY
+aws s3api list-object-versions --bucket BUCKETNAME --prefix KEY
+```
+
 - ✅ Retrieve a given version of an object
+```bash
+aws s3api get-object --bucket BUCKETNAME --key KEY --version-id VERSION_ID ./tmp.txt
+```
+
 
 [Doc AWS](https://docs.aws.amazon.com/AmazonS3/latest/userguide/Versioning.html)
