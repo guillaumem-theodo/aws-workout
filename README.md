@@ -88,9 +88,9 @@ In order to apply a tutorial use the **run-tutorial.sh** command.
 ...
 ```
 
-Tutorials are **chain linked**. For example, **102-basic-subnets** requires **101-basic-vpc** tutorial. 
-You are free to apply manually each tutorials in the right order OR you can rely on **terragrunt** to apply the dependencies for you.
-E.g. if **101-basic-vpc** has not been applied manually, it will be automatically applied if you apply **102-basic-subnets** tutorial.
+Tutorials are **chain linked**. For example, **102-basic-subnets** requires resources created in **101-basic-vpc** tutorial. 
+You are free to apply manually each tutorials in the right order (one at a time) OR you can rely on **terragrunt** to apply the dependencies in the right order for you.
+E.g. if **101-basic-vpc** has not been applied manually, Terragrunt will be automatically applied it for you if you apply **102-basic-subnets** tutorial.
 
 Once the components have been properly created in AWS, you can test some assertions .
 
@@ -101,6 +101,8 @@ Once the components have been properly created in AWS, you can test some asserti
 ...
 ```
 
+Assertions are shell scripts named `TEST-xxxxxx.sh`. They provide easy ways to test the tutorials.
+
 #### 🧹To delete a Terraform Workout and free AWS resources:
 At the end of the workout step, and if the step is not required for the next ones, you should delete the created AWS components.
 Otherwise, you will 💸💸💸 **PAY** 💸💸💸 for unused components or services.
@@ -110,6 +112,9 @@ Otherwise, you will 💸💸💸 **PAY** 💸💸💸 for unused components or s
 ./delete-tutorial.sh ./1-networking/101-basic-vpc
 ...
 ```
+
+Tutorials are **chain linked**. When you destroy ``102-basic-subnet`` it will delete ``101-basic-vpc`` 
+
 
 ### CloudFormation Workouts 
 
