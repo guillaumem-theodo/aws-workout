@@ -9,7 +9,11 @@
 
 NB: With Terraform you can get AZ name using: ``data.aws_availability_zones.all.names`` array values
 
-🏁 Test the Created subnets using AWS CLI `aws ec2 describe-subnets`
+🏁 Test the Created subnets using AWS CLI `aws ec2 describe-subnets`  
+Reminder:
+- You can use filtering capabilities on aws [CLI command](https://docs.aws.amazon.com/cli/latest/userguide/cli-usage-filter.html) to select the VPC. E.g: ``--filters Name=tag:Name,Values=net-101-vpc``
+- You can use querying capabilities to see only some Subnets attributes. E.g: ``Subnets[].[SubnetId, CidrBlock, AvailabilityZone]``
+
 
 ## Support
 You select the size of the subnet using the subnet IPv4 CIDR.

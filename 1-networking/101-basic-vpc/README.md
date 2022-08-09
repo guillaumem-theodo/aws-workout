@@ -5,7 +5,9 @@
 The VPC must be able to support at least 40000 private IP addresses.
 The **size** of the VPC is chosen using the IPv4 CIDR parameter of the VPC (at creation).
 
-🏁 Test the Created VPC using AWS CLI `aws ec2 describe-vpcs`
+🏁 Test the Created VPC using AWS CLI `aws ec2 describe-vpcs`  
+- You can use filtering capabilities on aws [CLI command](https://docs.aws.amazon.com/cli/latest/userguide/cli-usage-filter.html) to select the VPC. E.g: ``--filters Name=tag:Name,Values=net-101-vpc``
+- You can use querying capabilities to see only some attributes. E.g: ``--query 'Vpcs[0].CidrBlock'``
 
 ## Support
 #### RFC 1918 Blocks of IP addresses
