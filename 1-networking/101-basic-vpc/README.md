@@ -1,12 +1,13 @@
-## Create a simple VPC (Virtual Private Cloud)
+# Create a simple VPC (Virtual Private Cloud)
 
+## Your mission
 1️⃣ Create a simple VPC named **net-101-vpc**. 
-The VPC must be able to support nearly 65536 private IP addresses.
-The **size** of the VPC is choosen using the IPv4 CIDR parameter of the VPC (at creation).
+The VPC must be able to support at least 40000 private IP addresses.
+The **size** of the VPC is chosen using the IPv4 CIDR parameter of the VPC (at creation).
 
 🏁 Test the Created VPC using AWS CLI `aws ec2 describe-vpcs`
 
-
+## Support
 #### RFC 1918 Blocks of IP addresses
 You can use https://www.ipaddressguide.com/cidr to see and compute blocks of Ips
 
