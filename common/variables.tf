@@ -1,8 +1,3 @@
-## USE S3 BUCKET TO STORE TERRAFORM STATE
-terraform {
-  backend "s3" {
-  }
-}
 
 ########################################################################################################################
 ## INPUTS
@@ -23,17 +18,6 @@ variable "region" {
 variable "another-region" {
   type = string
   default = "us-east-1"
-}
-
-## REGION OF THE S3 BUCKET USED TO STORE TERRAFORM STATES
-variable "tf-s3-region" {
-  type = string
-  default = "eu-west-2"
-}
-
-## NAME OF THE S3 BUCKET USED TO STORE TERRAFORM STATES
-variable "tf-s3-bucket" {
-  type = string
 }
 
 data "aws_availability_zones" "all" {}

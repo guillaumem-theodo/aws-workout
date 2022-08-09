@@ -28,11 +28,13 @@ You will be prompted if a dependant workout has not been deployed.
 - Install ``jq`` : https://stedolan.github.io/jq/tutorial/
 - Install ``AWS CLI`` : https://docs.aws.amazon.com/cli/latest/userguide/cli-chap-install.html 
 - Install ``Terraform`` : https://learn.hashicorp.com/tutorials/terraform/install-cli
+- Install ``Terragrunt``:  https://terragrunt.gruntwork.io/docs/getting-started/install
 - Install ``Serverless Framework`` : https://www.serverless.com/framework/docs/getting-started
 
 All workouts have been tested with:
 - AWS CLI **1.17.2** or AWS CLI **2.2.10**
 - Terraform **1.0.1** or Terraform **1.0.2**
+- Terragrunt **0.36.1**
 - Serverless Framework **2.3.0**
 - Mac OS 10.15
 - Ubuntu 20.04 LTS
@@ -44,7 +46,8 @@ All workouts have been tested with:
 🔥🔥🔥   You are responsible to delete workouts and/or created resources, services or components at the end of the workout.
 Otherwise, AWS will bill you...
 
-🔥🔥🔥   We highly suggest you creating a budget and alerting in your AWS account.
+🔥🔥🔥   We highly suggest you creating a budget and alerting in your AWS account. Follow this AWS [tutorial](https://docs.aws.amazon.com/cost-management/latest/userguide/budgets-create.html)
+
 
 ## LET'S START
 ### 🚀 Set up your AWS profile 🚀 
@@ -54,85 +57,29 @@ All shell commands provided in these tutorials require this profile.
 ### 🚀 How to perform Workouts ? 🚀 
 
 You can perform Workouts with two modes:
-- **Terraform**: you will see basics of **Terraform** while learning AWS [intro terraform](https://www.terraform.io/intro/index.html)
+- **Terraform**: you will see basics of **Terraform** and **Terragrunt** while learning AWS [intro terraform](https://www.terraform.io/intro/index.html)
 - **AWS CloudFormation**: you will see basics of **CloudFormation** while learning AWS [intro cloudformation](https://aws.amazon.com/fr/cloudformation/getting-started/)
   
 These workouts do not intend to show **Terraform** or **CloudFormation** best practices. 
 
 There are very tiny differences between the two modes:
-- some workouts require components/services deployed in multiple regions. Terraform supports multi-region Stacks, whereas CloudFormation requires one stack per region.
+- Some workouts require components/services deployed in multiple regions. Terraform supports multi-region Stacks, whereas CloudFormation requires one stack per region.
 - Terraform allows modifying default objects (routes...) whereas CloudFormation does not.
 
-⚠️ But YOU CAN NOT SWITCH FROM TERRAFORM TO CLOUDFORMATION (or reverse) ⚠️
+⚠️ YOU CAN NOT SWITCH FROM TERRAFORM TO CLOUDFORMATION (or reverse) ⚠️
 - **Terraform** Workouts may require states from the previous ones (stored in S3 bucket). 
 - **Cloudformation** Workouts may require Stack outputs from previous ones (stored in AWS CloudFormation Stacks). ️
 
-### 🔑🔑 Create a Key Pair for your EC2 🔑🔑
-In order to work with and to log into the EC2, you need to create an SSH keypair.
-A key pair is a pair of private and public keys.
-You will need to have the private key stored on your laptop (in the Workout root directory).
-The public key need to be stored in AWS EC2 KeyPair Service.
+### AWS EC2 key pairs
+Some workouts will create EC2 that requires SSH key pairs to log-in.
+Follow this tutorial to create and inject a keypair in AWS [Key Pair](./doc/keypair.md).
 
-#### 🚧 Howto to create and store the keypair:
-In the Workout root directory 
-  
-```shell
-./generate-keypair.sh
-```
-
-It will generate the private and public key files
-  - private key file named `aws-workout-key-pair.pem`. Must be stored on your laptop in the Workout root directory.
-  - public key file named `aws-workout-key-pair.pub`. Will be automatically uploaded in AWS. 
-
-It will create a keypair in AWS named `aws-workout-key` and upload the public part of the key from your laptop.
-
-#### 🚧 Enable SSH Agent Forwarding
-
-Many TEST files rely on SSH and SSH Agent Forwarding (from your laptop to EC2 then to other EC2). 
-Agent Forwarding is a way to SSH from servers to servers using the same credentials.
-You need to enable **SSH Agent Forwarding** and to add the private key.
-
-⚠️ SSH Agent Forwarding is not a good practice on PROD environments.
-
-1) Enable SSH Agent Forwarding
-```bash
-vim ~/.ssh/config
-
-Add:
-Host *
-  ForwardAgent yes
-  AddKeysToAgent yes
-```
-
-2) Add the private key in agent forwarding
-```bash
-ssh-add -k aws-workout-key-pair.pem
-```
-
-2) You can check if the agent fowarding is set up using following command
-```bash
-ssh-add -L
-```
-
+## Tutorials
 ### Terraform Workouts 
 If you want to use TERRAFORM versions, please install [Terraform CLI](./doc/install-terraform.md). 
 
 #### 🚧 To apply a Terraform Workout Step:
-First initialize the Terraform state for the Workout Step (in the Workout Root directory). 
-  It will create the Terraform State (one per workout step) in the S3 bucket  
-  
-```shell
-./init-tutorial.sh xxxx
-./init-tutorial.sh ./1-networking/101-basic-vpc
-./init-tutorial.sh ./1-networking/102-basic-subnets
-...
-``` 
-
-NB: The `init-tutorial.sh` command creates a SYMLINK from `common\variables.tf` directory inside the workout step directory.
-This way, the `main.tf` Terraform file can **inherits** variables and data (and thus reduce the complexity of the file).
-
-
-Then, apply the Terraform plan on your AWS account 
+In order to apply a tutorial use the **run-tutorial.sh** command.
 
 ```shell
 ./run-tutorial.sh xxxx
@@ -141,7 +88,11 @@ Then, apply the Terraform plan on your AWS account
 ...
 ```
 
-Once the components have been properly created in AWS, you can test some assertions 
+Tutorials are **chain linked**. For example, **102-basic-subnets** requires **101-basic-vpc** tutorial. 
+You are free to apply manually each tutorials in the right order OR you can rely on **terragrunt** to apply the dependencies for you.
+E.g. if **101-basic-vpc** has not been applied manually, it will be automatically applied if you apply **102-basic-subnets** tutorial.
+
+Once the components have been properly created in AWS, you can test some assertions .
 
 ```shell
 ./launch.sh ./xxxx/TEST-yyyy.sh

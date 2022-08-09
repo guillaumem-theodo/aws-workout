@@ -1,25 +1,10 @@
 ########################################################################################################################
-provider "aws" {
-  region = var.region
-  profile = "aws-workout"
+variable "vpc_id" {
+  type = string
 }
 
-data "terraform_remote_state" "vpc-101" {
-  backend = "s3"
-  config = {
-    bucket = var.tf-s3-bucket
-    key = "101-basic-vpc"
-    region = var.tf-s3-region
-  }
-}
-
-data "terraform_remote_state" "subnets-102" {
-  backend = "s3"
-  config = {
-    bucket = var.tf-s3-bucket
-    key = "102-basic-subnets"
-    region = var.tf-s3-region
-  }
+variable "subnet_102_id" {
+  type = string
 }
 
 ######################################################################################
@@ -29,7 +14,7 @@ resource "aws_instance" "ec2-1" {
   ami = data.aws_ami.amazon-linux.image_id
   instance_type = "t2.micro"
   associate_public_ip_address = true
-  subnet_id = data.terraform_remote_state.subnets-102.outputs.net-102-subnet-1-id
+  subnet_id = var.subnet_102_id
   key_name = "aws-workout-key"
 
   tags = {
