@@ -5,7 +5,8 @@
 - [103-vpc-default-route-default-sg](./103-vpc-default-route-default-sg):
     - View 👉 **Default** Route associated with a VPC (by default)
     - View 👉 **Default** Security Group associated with a VPC (by default)
-    - Create Two EC2 (computation instances) in subnets
+    - View 👉 **Default** Network ACL associated with a VPC (by default)
+    - Create one EC2 (computation instance) in a subnet
     - Show that EC2 can't be SSH
 - [104-internet-access](./104-internet-access): Add an 👉 **Internet Gateway**
     - Create a Route to Internet through Internet Gateway
