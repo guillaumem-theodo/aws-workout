@@ -35,7 +35,7 @@ EOF
 
 terraform {
   ## Read Commons variables and plugin (shared with all tutorials)
-  source = "${get_parent_terragrunt_dir()}/common"
+  source = "${get_parent_terragrunt_dir()}/common///"
 
   ## Setup AWS_PROFILE for all commands for all tutorials
   extra_arguments "aws_profile" {

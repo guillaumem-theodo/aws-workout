@@ -1,43 +1,33 @@
 ########################################################################################################################
-provider "aws" {
-  region = var.region
-  profile = "aws-workout"
+variable "vpc_id" {
+  type = string
 }
 
-data "terraform_remote_state" "vpc-101" {
-  backend = "s3"
-  config = {
-    bucket = var.tf-s3-bucket
-    region = var.tf-s3-region
-    key = "101-basic-vpc"
-  }
+variable "public_subnet_102_id" {
+  type = string
 }
-data "terraform_remote_state" "subnets-102" {
-  backend = "s3"
-  config = {
-    bucket = var.tf-s3-bucket
-    key = "102-basic-subnets"
-    region = var.tf-s3-region
-  }
+
+variable "private_subnet_102_id" {
+  type = string
 }
 
 ######################################################################################
 ## Create a BASTION architecture
 ## 1) create an internet gateway (IGW) for public access to/from internet (for the public subnet)
-## 2) create a route table and a route to 0.0.0.0 via IGW (for the public subnet)
+## 2) create a route table and a route to 0.0.0.0 via IGW (associated to the public subnet)
 ## 3) authorize PING and SSH in a security group (for the public subnet)
-## 4) associate the security group to the BASTION EC2 instances
+## 4) associate the security group to the BASTION EC2 instance
 ## 5) create a route table from bastion subnet to private subnet (local vpc)
 ## 6) authorize all traffic from bastion subnet (only) TO private subnet (within a security group)
 ## 7) associate the security group to the PRIVATE EC2 instances
 
 ## Internet Gateway is a BIDIRECTIONAL gateway to Internet from VPC
 resource "aws_internet_gateway" "igw-105" {
-  vpc_id = data.terraform_remote_state.vpc-101.outputs.net-101-vpc-id
+  vpc_id = var.vpc_id
   tags = {
     Purpose: var.dojo
     Name: "net-105-igw"
-    Description: "An Internet Gateway (both direction) attached to VPC ${data.terraform_remote_state.vpc-101.outputs.net-101-vpc-id} "
+    Description: "An Internet Gateway (both direction) attached to VPC ${var.vpc_id} "
 
   }
 }
@@ -46,7 +36,7 @@ resource "aws_internet_gateway" "igw-105" {
 ## The route table routes all traffic from/to internet through Internet gateway
 ## The route table is associated to the subnet
 resource "aws_route_table" "route-table-105-1" {
-  vpc_id = data.terraform_remote_state.vpc-101.outputs.net-101-vpc-id
+  vpc_id = var.vpc_id
 
   route {
     cidr_block = "0.0.0.0/0"
@@ -61,7 +51,7 @@ resource "aws_route_table" "route-table-105-1" {
 
 resource "aws_route_table_association" "rt-association-subnet1-105" {
   route_table_id = aws_route_table.route-table-105-1.id
-  subnet_id = data.terraform_remote_state.subnets-102.outputs.net-102-subnet-1-id
+  subnet_id = var.public_subnet_102_id
 }
 
 ## Create a PUBLIC SECURITY GROUP associated to the VPC
@@ -69,7 +59,7 @@ resource "aws_route_table_association" "rt-association-subnet1-105" {
 ## The SG allows all incoming PORT ICMP (ping) traffic from Internet (0.0.0.0/0) - bad habit but for demo purpose
 
 resource "aws_security_group" "bastion-sg-105-1" {
-  vpc_id = data.terraform_remote_state.vpc-101.outputs.net-101-vpc-id
+  vpc_id = var.vpc_id
 
   ## ALL SSH AND PING INCOMING TRAFFIC ENTERING THE SECURITY GROUP COMING FROM YOUR LAPTOP
   ingress {
@@ -105,7 +95,7 @@ resource "aws_instance" "bastion-ec2" {
   ami = data.aws_ami.amazon-linux.image_id
   instance_type = "t2.micro"
   associate_public_ip_address = true
-  subnet_id = data.terraform_remote_state.subnets-102.outputs.net-102-subnet-1-id
+  subnet_id = var.public_subnet_102_id
   security_groups = [aws_security_group.bastion-sg-105-1.id]
   key_name = "aws-workout-key"
 
@@ -119,7 +109,7 @@ resource "aws_instance" "bastion-ec2" {
 ## The route table routes all traffic from/to Bastion SUBNET
 ## The route table is associated to the private subnet
 resource "aws_route_table" "route-table-105-2" {
-  vpc_id = data.terraform_remote_state.vpc-101.outputs.net-101-vpc-id
+  vpc_id = var.vpc_id
 
   tags = {
     Purpose: var.dojo
@@ -129,16 +119,16 @@ resource "aws_route_table" "route-table-105-2" {
 
 resource "aws_route_table_association" "rt-association-subnet2-105" {
   route_table_id = aws_route_table.route-table-105-2.id
-  subnet_id = data.terraform_remote_state.subnets-102.outputs.net-102-subnet-2-id
+  subnet_id = var.private_subnet_102_id
 }
 
 ## Create a PUBLIC SECURITY GROUP associated to the VPC
 ## The SG allows all incoming PORT 22 traffic from the Bastion
 
-resource "aws_security_group" "bastion-sg-105-2" {
-  vpc_id = data.terraform_remote_state.vpc-101.outputs.net-101-vpc-id
+resource "aws_security_group" "private-sg-105-2" {
+  vpc_id = var.vpc_id
 
-  ## ALL  TRAFFIC ENTERING THE SECURITY GROUP COMING FROM THE BASTION
+  ## ALL  TRAFFIC ENTERING THE SECURITY GROUP COMING FROM THE BASTION (on ONLY from the Bastion)
   ingress {
     from_port = 0
     protocol = "-1"
@@ -161,8 +151,8 @@ resource "aws_instance" "private-ec2" {
   ami = data.aws_ami.amazon-linux.image_id
   instance_type = "t2.micro"
   associate_public_ip_address = false
-  subnet_id = data.terraform_remote_state.subnets-102.outputs.net-102-subnet-2-id
-  security_groups = [aws_security_group.bastion-sg-105-2.id]
+  subnet_id = var.private_subnet_102_id
+  security_groups = [aws_security_group.private-sg-105-2.id]
   key_name = "aws-workout-key"
 
   tags = {
@@ -185,5 +175,5 @@ output "net-105-rt-2-id" {
 }
 
 output "net-105-sg-2-id" {
-  value = aws_security_group.bastion-sg-105-2.id
+  value = aws_security_group.private-sg-105-2.id
 }
