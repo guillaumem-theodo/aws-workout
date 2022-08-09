@@ -37,6 +37,9 @@
   <component name="ProjectRootManager" version="2" languageLevel="JDK_1_5">
     <output url="file://$PROJECT_DIR$/out" />
   </component>
+  <component name="ProjectType">
+    <option name="id" value="jpab" />
+  </component>
   <component name="SvnConfiguration">
     <option name="USER" value="" />
     <option name="PASSWORD" value="" />

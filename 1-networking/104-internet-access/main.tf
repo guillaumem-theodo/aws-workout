@@ -1,24 +1,10 @@
 ########################################################################################################################
-provider "aws" {
-  region = var.region
-  profile = "aws-workout"
+variable "vpc_id" {
+  type = string
 }
 
-data "terraform_remote_state" "vpc-101" {
-  backend = "s3"
-  config = {
-    bucket = var.tf-s3-bucket
-    region = var.tf-s3-region
-    key = "101-basic-vpc"
-  }
-}
-data "terraform_remote_state" "subnets-102" {
-  backend = "s3"
-  config = {
-    bucket = var.tf-s3-bucket
-    key = "102-basic-subnets"
-    region = var.tf-s3-region
-  }
+variable "subnet_102_id" {
+  type = string
 }
 
 ######################################################################################
@@ -30,12 +16,11 @@ data "terraform_remote_state" "subnets-102" {
 
 ## Internet Gateway is a BIDIRECTIONAL gateway to Internet from VPC
 resource "aws_internet_gateway" "igw-104" {
-  vpc_id = data.terraform_remote_state.vpc-101.outputs.net-101-vpc-id
+  vpc_id = var.vpc_id
   tags = {
     Purpose: var.dojo
     Name: "net-104-igw"
-    Description: "An Internet Gateway (both direction) attached to VPC ${data.terraform_remote_state.vpc-101.outputs.net-101-vpc-id} "
-
+    Description: "An Internet Gateway (both direction) attached to VPC ${var.vpc_id} "
   }
 }
 
@@ -43,7 +28,7 @@ resource "aws_internet_gateway" "igw-104" {
 ## The route table routes all traffic from/to internet through Internet gateway
 ## The route table is associated to the subnet
 resource "aws_route_table" "route-table-104" {
-  vpc_id = data.terraform_remote_state.vpc-101.outputs.net-101-vpc-id
+  vpc_id = var.vpc_id
 
   route {
     cidr_block = "0.0.0.0/0"
@@ -58,7 +43,7 @@ resource "aws_route_table" "route-table-104" {
 
 resource "aws_route_table_association" "rt-association-subnet1-104" {
   route_table_id = aws_route_table.route-table-104.id
-  subnet_id = data.terraform_remote_state.subnets-102.outputs.net-102-subnet-1-id
+  subnet_id =  var.subnet_102_id
 }
 
 ## Create a SECURITY GROUP associated to the VPC
@@ -66,7 +51,7 @@ resource "aws_route_table_association" "rt-association-subnet1-104" {
 ## The SG allows all incoming PORT ICMP (ping) traffic from Internet (0.0.0.0/0) - bad habit but for demo purpose
 
 resource "aws_security_group" "sg-104" {
-  vpc_id = data.terraform_remote_state.vpc-101.outputs.net-101-vpc-id
+  vpc_id = var.vpc_id
 
   ## ALL SSH AND PING INCOMING TRAFFIC ENTERING THE SECURITY GROUP
   ingress {
@@ -95,14 +80,14 @@ resource "aws_security_group" "sg-104" {
   }
 }
 
-## CREATE an EC2 inside the subnet (with the associated route table) and inside the security group
+## CREATE an EC2 inside the subnet (with the associated route table) and associated to the security group
 ## As a consequence the EC2 should be reachable (ping and SSH) from internet
 ## And EC2 can initiate traffic to internet (curl...)
 resource "aws_instance" "public-ec2" {
   ami = data.aws_ami.amazon-linux.image_id
   instance_type = "t2.micro"
   associate_public_ip_address = true
-  subnet_id = data.terraform_remote_state.subnets-102.outputs.net-102-subnet-1-id
+  subnet_id = var.subnet_102_id
   security_groups = [aws_security_group.sg-104.id]
   key_name = "aws-workout-key"
 
