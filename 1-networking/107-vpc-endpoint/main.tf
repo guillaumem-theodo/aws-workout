@@ -1,7 +1,22 @@
 ########################################################################################################################
-provider "aws" {
-  region = var.region
-  profile = "aws-workout"
+variable "vpc_id" {
+  type = string
+}
+
+variable "public_subnet_102_id" {
+  type = string
+}
+
+variable "private_subnet_102_id" {
+  type = string
+}
+
+variable "private_route_table_105_id" {
+  type = string
+}
+
+variable "private_security_group_105_id" {
+  type = string
 }
 
 provider "aws" {
@@ -9,32 +24,6 @@ provider "aws" {
   region = var.another-region
   profile = "aws-workout"
 }
-
-data "terraform_remote_state" "vpc-101" {
-  backend = "s3"
-  config = {
-    bucket = var.tf-s3-bucket
-    region = var.tf-s3-region
-    key = "101-basic-vpc"
-  }
-}
-data "terraform_remote_state" "subnets-102" {
-  backend = "s3"
-  config = {
-    bucket = var.tf-s3-bucket
-    key = "102-basic-subnets"
-    region = var.tf-s3-region
-  }
-}
-data "terraform_remote_state" "bastion-105" {
-  backend = "s3"
-  config = {
-    bucket = var.tf-s3-bucket
-    key = "105-bastion"
-    region = var.tf-s3-region
-  }
-}
-
 
 ######################################################################################
 ## Show how to reach AWS services (example: S3 bucket) using (or not) a VPC Endpoint
@@ -61,8 +50,8 @@ resource "aws_s3_bucket" "s3-bucket-2-107" {
   }
 }
 resource "aws_vpc_endpoint" "vpc-endpoint-1-107" {
-  vpc_id = data.terraform_remote_state.vpc-101.outputs.net-101-vpc-id
+  vpc_id = var.vpc_id
   service_name = "com.amazonaws.${var.region}.s3"
-  route_table_ids = [data.terraform_remote_state.bastion-105.outputs.net-105-rt-2-id]
+  route_table_ids = [var.private_route_table_105_id]
 }
 

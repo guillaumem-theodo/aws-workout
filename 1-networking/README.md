@@ -28,8 +28,8 @@
     - Show Traceroute to internet from Private EC2: through NAT Gateway
 - [107-vpc-endpoint](./107-vpc-endpoint): Create a 👉 **S3 VPC Gateway Endpoint** to reach S3 privately
     - Create a VPC Gateway Endpoint to S3 buckets in one region
-    - Show traceroute to S3 bucket in the same region: use direct VPC Endpoint
-    - Show traceroute to S3 bucket in another region: use NAT Gateway (and thus internet)
+    - Show route to S3 bucket in the same region: use direct VPC Endpoint
+    - It is not possible to access S3 bucket in another region: no internet route
 - [108-dns](./108-dns): Show that VPC contains 👉 **VPC DNS**
     - it provides DNS names to EC2
     - it provides DNS resolution to find EC2 (either using public DNS names or private ones)  

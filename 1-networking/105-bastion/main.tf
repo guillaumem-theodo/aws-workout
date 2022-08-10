@@ -11,6 +11,10 @@ variable "private_subnet_102_id" {
   type = string
 }
 
+variable "ec2_profile_instance_id" {
+  type = string
+}
+
 ######################################################################################
 ## Create a BASTION architecture
 ## 1) create an internet gateway (IGW) for public access to/from internet (for the public subnet)
@@ -135,6 +139,13 @@ resource "aws_security_group" "private-sg-105-2" {
     to_port = 0
     security_groups = [aws_security_group.bastion-sg-105-1.id]
   }
+  ## ALL OUTGOING TRAFFIC INITIATED FROM THE SECURITY GROUP
+  egress {
+    from_port        = 0
+    to_port          = 0
+    protocol         = "-1"
+    cidr_blocks      = ["0.0.0.0/0"]
+  }
 
   tags = {
     Purpose: var.dojo
@@ -154,6 +165,7 @@ resource "aws_instance" "private-ec2" {
   subnet_id = var.private_subnet_102_id
   security_groups = [aws_security_group.private-sg-105-2.id]
   key_name = "aws-workout-key"
+  iam_instance_profile = var.ec2_profile_instance_id
 
   tags = {
     Purpose: var.dojo

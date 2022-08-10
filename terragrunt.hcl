@@ -66,7 +66,7 @@ terraform {
 
     arguments = [
       "-var", "region=${get_env("TUTORIAL_REGION")}",
-      "-var", "another-region=us-${get_env("TUTORIAL_ANOTHER_REGION")}"
+      "-var", "another-region=${get_env("TUTORIAL_ANOTHER_REGION")}"
     ]
   }
 }
