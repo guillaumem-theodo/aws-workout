@@ -21,13 +21,18 @@ remote_state {
   }
 }
 
-## Shared PROVIDER for all Workouts
+## Shared PROVIDERS for all Workouts (one provider in one region, another in a second region)
 generate "provider" {
   path = "provider.tf"
   if_exists = "overwrite_terragrunt"
   contents = <<EOF
 provider "aws" {
   region = var.region
+  profile = "aws-workout"
+}
+provider "aws" {
+  alias = "another-region"
+  region = var.another-region
   profile = "aws-workout"
 }
 EOF
@@ -66,7 +71,8 @@ terraform {
 
     arguments = [
       "-var", "region=${get_env("TUTORIAL_REGION")}",
-      "-var", "another-region=${get_env("TUTORIAL_ANOTHER_REGION")}"
+      "-var", "another-region=${get_env("TUTORIAL_ANOTHER_REGION")}",
+      "-var", "unique-key=${get_env("TUTORIAL_UNIQUE_KEY")}"
     ]
   }
 }
