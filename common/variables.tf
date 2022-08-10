@@ -20,6 +20,11 @@ variable "another-region" {
   default = "us-east-1"
 }
 
+## A UNIQUE KEY used for S3 buckets uniqueness
+variable "unique-key" {
+  type = string
+}
+
 data "aws_availability_zones" "all" {}
 
 data "aws_ami" "amazon-linux" {
