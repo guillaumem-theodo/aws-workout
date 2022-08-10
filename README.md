@@ -3,15 +3,15 @@
 
 ### 🏛 Tutorials organisation 🏛 
 
-We have grouped Workout Steps by knowledge categories:
-- Networking: [1-networking](./1-networking)   (VPC, subnets, security groups, peering, dns)
+We have grouped Workouts by knowledge categories:
+- Networking: [1-networking](./1-networking)   (VPC, subnets, security groups, peering, dns, NAT gateway, VPC endpoints...)
 - Computing: [2-computing](./2-computing)  (EC2, ECS, Lambdas, ALB, Auto-scaling)
 - Storing: [3-storing](./3-storing)  (S3, RDS, Dynamodb)
 - Protecting: 🕰 Soon...stay tuned (KMS, S3, ACM)
 - Publishing: 🕰 Soon...stay tuned (CloudFront, pre-signed URL, OAI)
 - Monitoring: 🕰 Soon...stay tuned (CloudWatch, CloudTrail, FlowLogs)
 
-In each knowledge area, we have ordered the Workout steps by difficulty. Example:
+In each knowledge area, Workouts are ordered by difficulty. Example:
 - 101-basic-vpc
 - 102-basic-subnets
 - 103-vpc-default-route-default-security-group
@@ -19,9 +19,8 @@ In each knowledge area, we have ordered the Workout steps by difficulty. Example
 - 105-nat-gateway
 and so on...
 
-Some steps rely on previous steps. In each directory, the `dep.txt` file lists the required dependencies. 
+Some workouts rely on previous workouts.
 The shell commands to apply Terraform or Cloudformation stacks verify automatically the required dependencies. 
-You will be prompted if a dependant workout has not been deployed.
 
 ### Pre-requisites
 
@@ -43,43 +42,43 @@ All workouts have been tested with:
 
 All these workouts execute on **YOUR AWS account**. Many of these workouts induce costs.
 
-You are responsible to delete workouts and/or created resources, services or components at the end of the workout.
+You are responsible to delete workouts and created resources, services or components at the end of the workout.
 Otherwise, AWS will bill you...
 
-We highly suggest you creating a budget and alerting in your AWS account. Follow this AWS [tutorial](https://docs.aws.amazon.com/cost-management/latest/userguide/budgets-create.html)
+I highly suggest you creating a budget and budget alerts in your AWS account. Follow this AWS [tutorial](https://docs.aws.amazon.com/cost-management/latest/userguide/budgets-create.html)
 
+👉 NB: many resources and components created using the provided stacks are tagged with a `Purpose` Tag.
+You will be able to list all resources, using the AWS Tag Manager in AWS Console.
 
 ## LET'S START
 ### 🚀 Set up your AWS profile 🚀 
-First follow [this documentation](./doc/install-aws.md) to set up a `aws-workout` AWS profile on your computer.
+First follow [this documentation](./doc/install-aws.md) to set up an `aws-workout` AWS profile on your computer.
 All shell commands provided in these tutorials require this profile.
 
-### 🚀 How to perform Workouts ? 🚀 
+### 🚀 AWS EC2 key pairs 🚀 
+Some workouts will create EC2 that requires SSH key pairs to log-in.
+Follow this tutorial to create and inject a keypair in AWS [Key Pair](./doc/keypair.md).
 
-You can perform Workouts with two modes:
-- **Terraform**: you will see basics of **Terraform** and **Terragrunt** while learning AWS [intro terraform](https://www.terraform.io/intro/index.html)
-- **AWS CloudFormation**: you will see basics of **CloudFormation** while learning AWS [intro cloudformation](https://aws.amazon.com/fr/cloudformation/getting-started/)
+### 🚀 How to perform Workouts ? 🚀
+You can perform Workouts with two technical stacks:
+- **Terraform**: you will see basics of **Terraform** and **Terragrunt** while learning AWS. [See Terraform](https://www.terraform.io/intro/index.html)
+- **AWS CloudFormation**: you will see basics of **CloudFormation** while learning AWS. [See Cloudformation](https://aws.amazon.com/fr/cloudformation/getting-started/)
   
 These workouts do not intend to show **Terraform** or **CloudFormation** best practices. 
 
-There are very tiny differences between the two modes:
+There are differences between the two modes. For example:
 - Some workouts require components/services deployed in multiple regions. Terraform supports multi-region Stacks, whereas CloudFormation requires one stack per region.
 - Terraform allows modifying default objects (routes...) whereas CloudFormation does not.
 
 ⚠️ YOU CAN NOT SWITCH FROM TERRAFORM TO CLOUDFORMATION (or reverse) ⚠️
-- **Terraform** Workouts may require states from the previous ones (stored in S3 bucket). 
-- **Cloudformation** Workouts may require Stack outputs from previous ones (stored in AWS CloudFormation Stacks). ️
+- **Terraform** workouts may require states from the previous workouts (stored in Terraform State S3 bucket). 
+- **Cloudformation** workouts may require stack outputs from previous workouts (stored in AWS CloudFormation Stacks). ️
 
-### AWS EC2 key pairs
-Some workouts will create EC2 that requires SSH key pairs to log-in.
-Follow this tutorial to create and inject a keypair in AWS [Key Pair](./doc/keypair.md).
-
-## Tutorials
-### Terraform Workouts 
-If you want to use TERRAFORM versions, please install [Terraform CLI](./doc/install-terraform.md). 
+## Terraform Workouts 
+If you want to use TERRAFORM versions, please install [Terraform and Terragrunt CLI](./doc/install-terraform.md). 
 
 #### 🚧 To apply a Terraform Workout Step:
-In order to apply a tutorial use the **run-tutorial.sh** command.
+In order to apply a workout use the **run-tutorial.sh** command.
 
 ```shell
 ./run-tutorial.sh xxxx
@@ -89,7 +88,7 @@ In order to apply a tutorial use the **run-tutorial.sh** command.
 ```
 
 Tutorials are **chain linked**. For example, **102-basic-subnets** requires resources created in **101-basic-vpc** tutorial. 
-You are free to apply manually each tutorials in the right order (one at a time) OR you can rely on **terragrunt** to apply the dependencies in the right order for you.
+You are free to apply manually each tutorials one at a time OR you can rely on **Terragrunt** to apply the dependencies in the right order for you.
 E.g. if **101-basic-vpc** has not been applied manually, Terragrunt will be automatically applied it for you if you apply **102-basic-subnets** tutorial.
 
 Once the components have been properly created in AWS, you can test some assertions .
@@ -101,10 +100,10 @@ Once the components have been properly created in AWS, you can test some asserti
 ...
 ```
 
-Assertions are shell scripts named `TEST-xxxxxx.sh`. They provide easy ways to test the tutorials.
+Assertions are shell scripts named `TEST-xxxxxx.sh`. They provide easy ways to test the tutorials. This shell scripts use AWS CLI or pure bash command to test deployed components.
 
 #### 🧹To delete a Terraform Workout and free AWS resources:
-At the end of the workout step, and if the step is not required for the next ones, you should delete the created AWS components.
+At the end of the workout tutorial, and if the step is not required for the next ones, you must delete the created AWS components.
 Otherwise, you will 💸💸💸 **PAY** 💸💸💸 for unused components or services.
 ```shell
 ./delete-tutorial.sh xxx
@@ -113,10 +112,9 @@ Otherwise, you will 💸💸💸 **PAY** 💸💸💸 for unused components or s
 ...
 ```
 
-Tutorials are **chain linked**. When you destroy ``102-basic-subnet`` it will delete ``101-basic-vpc`` 
+Tutorials are **chain linked**. E.g: When you destroy ``102-basic-subnet`` it will delete ``101-basic-vpc``
 
-
-### CloudFormation Workouts 
+## CloudFormation Workouts 
 
 #### 🚧 To apply a CloudFormation Workout:
 Apply the CloudFormation stack using the following command:
@@ -149,5 +147,3 @@ Otherwise, you will 💸💸💸 **PAY** 💸💸💸 for unused components or s
 ```
 
 
-👉 NB: all resources and components created using the provided stacks are tagged with a `Purpose` Tag.
-You will be able to list all resources, using the AWS Tag Manager in AWS Console.
