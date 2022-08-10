@@ -39,14 +39,14 @@ All workouts have been tested with:
 - Mac OS 10.15
 - Ubuntu 20.04 LTS
 
-## DISCLAIMER 
+## 🔥🔥🔥DISCLAIMER🔥🔥🔥 
 
-🔥🔥🔥   All these workouts execute on **YOUR AWS account**. Many of these workouts induce costs.
+All these workouts execute on **YOUR AWS account**. Many of these workouts induce costs.
 
-🔥🔥🔥   You are responsible to delete workouts and/or created resources, services or components at the end of the workout.
+You are responsible to delete workouts and/or created resources, services or components at the end of the workout.
 Otherwise, AWS will bill you...
 
-🔥🔥🔥   We highly suggest you creating a budget and alerting in your AWS account. Follow this AWS [tutorial](https://docs.aws.amazon.com/cost-management/latest/userguide/budgets-create.html)
+We highly suggest you creating a budget and alerting in your AWS account. Follow this AWS [tutorial](https://docs.aws.amazon.com/cost-management/latest/userguide/budgets-create.html)
 
 
 ## LET'S START
