@@ -23,11 +23,11 @@ There are two types of **VPC Endpoints**:
 
 VPC endpoints are attached to a VPC and thus are **regional**.
 
-1️⃣ Create two S3 buckets (NB: S3 bucket names MUST BE unique WORLDWIDE):
-  - one located in the same region (e.g: eu-west-1) `net-107-s3-bucket-1`
-  - one located in another region  (e.g: us-east-1) `net-107-s3-bucket-2`   
+0️⃣Tutorial creates for you two S3 buckets (so you can test S3 access)
+  - one located in the first region (e.g: eu-west-1) `$UNIQUE_KEY-s3-bucket-1`
+  - one located in the secondary region  (e.g: us-east-1) `$UNIQUE_KEY-s3-bucket-2`   
 
-2️⃣ Add a VPC Endpoint for S3 (**Gateway** endpoint since the target service is S3)
+1️⃣ Add a VPC Endpoint for S3 (**Gateway** endpoint since the target service is S3)
   - Create a VPC Endpoint to S3 bucket in the first region
   - Modify the route table of the second subnet (``net-102-subnet-2``) to associate the VPC Endpoint
 
@@ -38,8 +38,8 @@ Nevertheless, having added a VPC endpoint for S3, EC2 is now able to reach S3 bu
 
 - ✅ Observe the routes of the second subnet. 
   - Route table should contain an entry for S3 service `com.amazonws.eu-west-1.s3` in the same region. This route is automatically added when creating the gateway endpoint.
-- ✅ On EC2 (ssh), use the `aws s3 ls --region eu-west-1 s3://thenameofyourfirstS3bucket` to see that S3 is accessible through VPC endpoint
-- ❌ On EC2 (ssh), use the `aws s3 ls --region us-east-1 s3://thenameofyoursecondS3bucket` to see that S3 in second region is NOT accessible
+- ✅ On EC2 (ssh), use the `aws s3 ls --region=$TUTORIAL_REGION s3://$TUTORIAL_UNIQUE_KEY-s3-bucket-1` to see that S3 is accessible through VPC endpoint
+- ❌ On EC2 (ssh), use the `aws s3 ls --region=$TUTORIAL_ANOTHER_REGION  s3://$TUTORIAL_UNIQUE_KEY-s3-bucket-2` to see that S3 in second region is NOT accessible
 
 ## Support
 
