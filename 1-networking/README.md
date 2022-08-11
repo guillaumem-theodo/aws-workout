@@ -30,6 +30,10 @@
     - Create a VPC Gateway Endpoint to S3 buckets in one region
     - Show route to S3 bucket in the same region: use direct VPC Endpoint
     - It is not possible to access S3 bucket in another region: no internet route
+- [107-vpc-endpoint-with-nat](./107-vpc-endpoint-with-nat): Create a 👉 **S3 VPC Gateway Endpoint** to reach S3 privately
+    - Create a VPC Gateway Endpoint to S3 buckets in one region
+    - Show route to S3 bucket in the same region: use direct VPC Endpoint
+    - Show route to S3 bucket in another region: use NAT gateway and internet
 - [108-dns](./108-dns): Show that VPC contains 👉 **VPC DNS**
     - it provides DNS names to EC2
     - it provides DNS resolution to find EC2 (either using public DNS names or private ones)  

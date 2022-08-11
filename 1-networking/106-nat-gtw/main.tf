@@ -54,16 +54,6 @@ resource "aws_route" "route-106-1" {
   destination_cidr_block = "0.0.0.0/0"
 }
 
-## Allow OUTGOING traffic in Private Security Group
-resource "aws_security_group_rule" "outgoing-route-sg" {
-  security_group_id = var.private_security_group_105_id
-  from_port = 0
-  protocol = -1
-  to_port = 0
-  type = "egress"
-  cidr_blocks      = ["0.0.0.0/0"]
-}
-
 output "net-106-nat-gtw-eip" {
   value = aws_eip.nat-gw-eip-106.private_ip
 }
