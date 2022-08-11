@@ -11,3 +11,12 @@ jspm_packages
 .webpack
 .idea
 .idea/*
+.classpath.txt
+target
+.classpath
+.project
+.settings
+.vscode
+*.iml
+.cdk.staging
+cdk.out
