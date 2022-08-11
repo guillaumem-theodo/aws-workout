@@ -1,6 +1,7 @@
-## VPC with or without DNS Support
+# VPC with or without DNS Support
 
-AWS VPC come with AWS internal DNS service.
+## Your mission
+AWS VPC come with AWS internal **DNS service**.
 When creating a VPC you can enable or disable DNS service.
 
 - You can enable/disable DNS resolution service.
@@ -20,6 +21,10 @@ Example: if your VPC CIDR is `10.0.0.0/24`. The DNS service will be at IP: `10.0
 - ✅ The EC2 in the second VPC has ONLY a private DNS name
 - ✅ Using `nslookup` command, from your laptop, try to get the public IP from the public DNS name
 - ❌ Using `nslookup` command, from your laptop try to get the private IP from the private DNS name
+- ✅ Using `nslookup` command, from inside the first EC2, get the IP of the second EC2 using its private name. Resolve to the private IP.
+- ✅ Using `nslookup` command, from inside the first EC2, get the IP of the second EC2 using its public name. Also resolve to the private IP.
+
+## Support
 
 [Doc AWS](https://docs.aws.amazon.com/vpc/latest/userguide/vpc-dns.html)
 
