@@ -14,6 +14,7 @@ import java.util.Collections;
 import java.util.List;
 
 import static gmi.workouts.CdkApp.PURPOSE;
+import static gmi.workouts.utils.TagsHelper.createCommonTags;
 
 public class DefaultRouteAndSecurityGroupStack103 extends Stack {
 
@@ -42,11 +43,5 @@ public class DefaultRouteAndSecurityGroupStack103 extends Stack {
                 .build();
 
     }
-    @NotNull
-    private static List<CfnTag> createCommonTags(String value) {
-        return Arrays.asList(
-                CfnTag.builder().key("Purpose").value(PURPOSE).build(),
-                CfnTag.builder().key("Name").value(value).build()
-        );
-    }
+
 }

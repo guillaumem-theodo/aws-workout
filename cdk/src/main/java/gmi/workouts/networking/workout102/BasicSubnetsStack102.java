@@ -1,18 +1,15 @@
 package gmi.workouts.networking.workout102;
 
 import gmi.workouts.networking.workout101.VpcStack101;
-import org.jetbrains.annotations.NotNull;
-import software.amazon.awscdk.CfnTag;
 import software.amazon.awscdk.Stack;
 import software.amazon.awscdk.StackProps;
 import software.amazon.awscdk.services.ec2.CfnSubnet;
 import software.amazon.awscdk.services.ec2.CfnVPC;
 import software.constructs.Construct;
 
-import java.util.Arrays;
 import java.util.List;
 
-import static gmi.workouts.CdkApp.PURPOSE;
+import static gmi.workouts.utils.TagsHelper.createCommonTags;
 
 public class BasicSubnetsStack102 extends Stack {
 
@@ -58,11 +55,4 @@ public class BasicSubnetsStack102 extends Stack {
         return subnet2;
     }
 
-    @NotNull
-    private static List<CfnTag> createCommonTags(String value) {
-        return Arrays.asList(
-                CfnTag.builder().key("Purpose").value(PURPOSE).build(),
-                CfnTag.builder().key("Name").value(value).build()
-        );
-    }
 }

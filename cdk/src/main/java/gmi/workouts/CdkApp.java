@@ -3,6 +3,7 @@ package gmi.workouts;
 import gmi.workouts.networking.workout101.VpcStack101;
 import gmi.workouts.networking.workout102.BasicSubnetsStack102;
 import gmi.workouts.networking.workout103.DefaultRouteAndSecurityGroupStack103;
+import gmi.workouts.networking.workout104.InternetAccessStack104;
 import software.amazon.awscdk.App;
 import software.amazon.awscdk.Environment;
 import software.amazon.awscdk.StackProps;
@@ -45,6 +46,13 @@ public class CdkApp {
                 new DefaultRouteAndSecurityGroupStack103(app, "workout-103-vpc-default-route-default-sg",
                 StackProps.builder()
                         .env(firstEnvironment)
-                        .build(), vpcStack101, networkingBasicSubnets102);    }
+                        .build(), vpcStack101, networkingBasicSubnets102);
+
+        InternetAccessStack104 internetAccessStack104 =
+                new InternetAccessStack104(app, "workout-104-internet-access",
+                StackProps.builder()
+                        .env(firstEnvironment)
+                        .build(), vpcStack101, networkingBasicSubnets102);
+    }
 }
 
