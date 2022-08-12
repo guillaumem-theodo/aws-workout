@@ -31,18 +31,18 @@ public class CdkApp {
     }
 
     private static void addNetworkingTutorialsStacks(App app, Environment firstEnvironment) {
-        VpcStack101 vpcStack101 = new VpcStack101(app, "NetworkingVpc101",
+        VpcStack101 vpcStack101 = new VpcStack101(app, "workout-101-basic-vpc",
                 StackProps.builder()
                         .env(firstEnvironment)
                         .build());
 
-        BasicSubnetsStack102 networkingBasicSubnets102 = new BasicSubnetsStack102(app, "NetworkingBasicSubnets102",
+        BasicSubnetsStack102 networkingBasicSubnets102 = new BasicSubnetsStack102(app, "workout-102-basic-subnets",
                 StackProps.builder()
                         .env(firstEnvironment)
                         .build(), vpcStack101);
 
         DefaultRouteAndSecurityGroupStack103 networkingDefaultRouteAndSg103 =
-                new DefaultRouteAndSecurityGroupStack103(app, "NetworkingDefaultRouteAndSg103",
+                new DefaultRouteAndSecurityGroupStack103(app, "workout-103-vpc-default-route-default-sg",
                 StackProps.builder()
                         .env(firstEnvironment)
                         .build(), vpcStack101, networkingBasicSubnets102);    }
