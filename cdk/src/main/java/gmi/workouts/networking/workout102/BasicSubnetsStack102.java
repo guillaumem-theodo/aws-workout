@@ -14,6 +14,7 @@ import static gmi.workouts.utils.TagsHelper.createCommonTags;
 public class BasicSubnetsStack102 extends Stack {
 
     private final CfnSubnet subnet2;
+    private final CfnSubnet subnet1;
 
     public BasicSubnetsStack102(final Construct scope, final String id, final StackProps props, VpcStack101 vpcStack101) {
         super(scope, id, props);
@@ -25,7 +26,7 @@ public class BasicSubnetsStack102 extends Stack {
 
         CfnVPC vpc1 = vpcStack101.getVpc1();
         // Create 4 subnets (in two AZ)
-        CfnSubnet.Builder.create(this, "net-102-subnet-1")
+        subnet1 = CfnSubnet.Builder.create(this, "net-102-subnet-1")
                 .cidrBlock("10.1.0.0/24")
                 .vpcId(vpc1.getAttrVpcId())
                 .availabilityZone(oneAZ)
@@ -49,6 +50,10 @@ public class BasicSubnetsStack102 extends Stack {
                 .availabilityZone(anotherAZ)
                 .tags(createCommonTags("net-102-subnet-4")).build();
 
+    }
+
+    public CfnSubnet getSubnet1() {
+        return subnet1;
     }
 
     public CfnSubnet getSubnet2() {

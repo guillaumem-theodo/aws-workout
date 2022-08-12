@@ -4,6 +4,7 @@ import gmi.workouts.networking.workout101.VpcStack101;
 import gmi.workouts.networking.workout102.BasicSubnetsStack102;
 import gmi.workouts.networking.workout103.DefaultRouteAndSecurityGroupStack103;
 import gmi.workouts.networking.workout104.InternetAccessStack104;
+import gmi.workouts.networking.workout105.BastionStack105;
 import software.amazon.awscdk.App;
 import software.amazon.awscdk.Environment;
 import software.amazon.awscdk.StackProps;
@@ -50,6 +51,12 @@ public class CdkApp {
 
         InternetAccessStack104 internetAccessStack104 =
                 new InternetAccessStack104(app, "workout-104-internet-access",
+                StackProps.builder()
+                        .env(firstEnvironment)
+                        .build(), vpcStack101, networkingBasicSubnets102);
+
+        BastionStack105 bastionStack105 =
+                new BastionStack105(app, "workout-105-bastion",
                 StackProps.builder()
                         .env(firstEnvironment)
                         .build(), vpcStack101, networkingBasicSubnets102);
