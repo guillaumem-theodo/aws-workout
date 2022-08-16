@@ -8,6 +8,7 @@ import gmi.workouts.networking.workout104.InternetAccessStack104;
 import gmi.workouts.networking.workout105.BastionStack105;
 import gmi.workouts.networking.workout106.NatGatewayStack106;
 import gmi.workouts.networking.workout107.VpcEndpointStack107;
+import gmi.workouts.networking.workout107nat.VpcEndpointWithNatStack107;
 import software.amazon.awscdk.App;
 import software.amazon.awscdk.Environment;
 import software.amazon.awscdk.StackProps;
@@ -85,6 +86,15 @@ public class CdkApp {
                         .env(firstEnvironment)
                         .build(),
                         vpcStack101, networkingBasicSubnets102, bastionStack105,
+                        s3ForTestsInFirstRegionStack,
+                        s3ForTestsInSecondRegionStack);
+
+        VpcEndpointWithNatStack107 vpcEndpointWithNatStack107 =
+                new VpcEndpointWithNatStack107(app, "workout-107-vpc-endpoint-with-nat",
+                StackProps.builder()
+                        .env(firstEnvironment)
+                        .build(),
+                        vpcStack101, networkingBasicSubnets102, bastionStack105, natGatewayStack106,
                         s3ForTestsInFirstRegionStack,
                         s3ForTestsInSecondRegionStack);
 
