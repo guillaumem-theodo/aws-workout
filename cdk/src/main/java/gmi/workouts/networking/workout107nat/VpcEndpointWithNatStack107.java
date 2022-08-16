@@ -35,7 +35,7 @@ public class VpcEndpointWithNatStack107 extends Stack {
 
         String tutorialRegion = System.getenv("TUTORIAL_REGION");
         CfnVPCEndpoint.Builder.create(this, "vpc-endpoint-1-107")
-                .vpcId(vpcStack101.getVpc1().getAttrVpcId())
+                .vpcId(vpcStack101.getVpc().getAttrVpcId())
                 .routeTableIds(Collections.singletonList(privateRouteTable.getAttrRouteTableId()))
                 .serviceName("com.amazonaws."+tutorialRegion+".s3")
                 .build();

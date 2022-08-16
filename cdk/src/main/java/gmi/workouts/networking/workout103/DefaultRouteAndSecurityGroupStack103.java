@@ -18,14 +18,23 @@ import static gmi.workouts.utils.TagsHelper.createCommonTags;
 
 public class DefaultRouteAndSecurityGroupStack103 extends Stack {
 
-    public DefaultRouteAndSecurityGroupStack103(final Construct scope, final String id, final StackProps props, VpcStack101 vpcStack101, BasicSubnetsStack102 networkingBasicSubnets102) {
+    private static final String LINUX_LATEST_AMZN_2_AMI_HVM_X_86_64_GP_2 = "/aws/service/ami-amazon-linux-latest/amzn2-ami-hvm-x86_64-gp2";
+
+    /*
+    ######################################################################################
+    ## CREATES one EC2 in subnet to show Default Routes
+    ######################################################################################
+     */
+    public DefaultRouteAndSecurityGroupStack103(final Construct scope, final String id, final StackProps props,
+                                                VpcStack101 vpcStack101,
+                                                BasicSubnetsStack102 basicSubnetsStack102) {
         super(scope, id, props);
         addDependency(vpcStack101);
-        addDependency(networkingBasicSubnets102);
+        addDependency(basicSubnetsStack102);
 
-        CfnSubnet subnet2 = networkingBasicSubnets102.getSubnet2();
+        CfnSubnet subnet2 = basicSubnetsStack102.getSubnet2();
 
-        IMachineImage latestAMI = MachineImage.fromSsmParameter("/aws/service/ami-amazon-linux-latest/amzn2-ami-hvm-x86_64-gp2", null);
+        IMachineImage latestAMI = MachineImage.fromSsmParameter(LINUX_LATEST_AMZN_2_AMI_HVM_X_86_64_GP_2, null);
 
         CfnInstance.Builder.create(this, "net-103-ec2-1")
                 .imageId(latestAMI.getImage(this).getImageId())

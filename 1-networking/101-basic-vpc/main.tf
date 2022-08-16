@@ -6,7 +6,7 @@
 ## - A set private IP (IPv4) addresses that will be available for your systems
 ## - CIDR specified at VPC creation defines the template of your private IP addresses
 ## - CIDR can rely on RFC 1918
-## - A VPC is in ONE AWS Region (e.g. eu-west-2)
+## - A VPC is in ONE AWS Region (e.g. eu-west-2). Region is selected with the AWS provider used with Terraform
 ######################################################################################
 resource "aws_vpc" "net-101-vpc" {
 
@@ -29,7 +29,6 @@ resource "aws_vpc" "net-101-vpc" {
   tags = {
     Purpose: var.dojo
     Name: "net-101-vpc"
-    Description: "A Sample VPC with a CIDR of 10.1.0.0/16 in ${var.region} Region"
   }
 }
 

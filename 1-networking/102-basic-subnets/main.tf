@@ -6,10 +6,10 @@ variable "vpc_id" {
 ######################################################################################
 ## SUBNETS
 ######################################################################################
-## 1) A Subnet is a subset of private IPs of the VPC CIDR block
-## The subnet CIDR block indicates the range of IPs that can be used in the subnet
+## 1) A Subnet is a subset of private IP addresses of the VPC CIDR block
+## The subnet CIDR block indicates the range of IP addresses that can be used in the subnet
 ## By definition the subnet CIDR block is included in the VPC CIDR block  (i.e. the /x of the subnet CIDR is greater than the /y of the VPC CIDR)
-## 2) A Subnet lies in ONE Availability Zone (one AZ of the VPC Region AZs)
+## 2) A Subnet spans in ONE Availability Zone (one AZ of the VPC Region AZs)
 ## 3) Subnets CIDR of the same VPC can't overlap
 
 ## This first SUBNET lies in the first AZ of the Region and has (256) IPs from 10.1.0.0 to 10.1.0.255
