@@ -15,6 +15,8 @@ import static gmi.workouts.utils.TagsHelper.createCommonTags;
 
 public class BastionStack105 extends Stack {
 
+    private CfnRouteTable routeTable;
+
     public BastionStack105(final Construct scope, final String id, final StackProps props,
                            VpcStack101 vpcStack101,
                            BasicSubnetsStack102 subnetsStack102) {
@@ -100,7 +102,7 @@ public class BastionStack105 extends Stack {
     }
 
     private void createAndAttachRouteTableToPrivateSubnet(VpcStack101 vpcStack101, CfnSubnet privateSubnet) {
-        CfnRouteTable routeTable = CfnRouteTable.Builder.create(this, "private-route-table-105")
+        routeTable = CfnRouteTable.Builder.create(this, "private-route-table-105")
                 .tags(createCommonTags("private-route-table-105"))
                 .vpcId(vpcStack101.getVpc1().getAttrVpcId())
                 .build();
@@ -159,5 +161,9 @@ public class BastionStack105 extends Stack {
                         ))
                 .tags(createCommonTags("net-105-ec2-2"))
                 .build();
+    }
+
+    public CfnRouteTable getPrivateRouteTable() {
+        return routeTable;
     }
 }

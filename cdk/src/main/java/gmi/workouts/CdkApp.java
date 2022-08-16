@@ -5,6 +5,7 @@ import gmi.workouts.networking.workout102.BasicSubnetsStack102;
 import gmi.workouts.networking.workout103.DefaultRouteAndSecurityGroupStack103;
 import gmi.workouts.networking.workout104.InternetAccessStack104;
 import gmi.workouts.networking.workout105.BastionStack105;
+import gmi.workouts.networking.workout106.NatGatewayStack106;
 import software.amazon.awscdk.App;
 import software.amazon.awscdk.Environment;
 import software.amazon.awscdk.StackProps;
@@ -60,6 +61,12 @@ public class CdkApp {
                 StackProps.builder()
                         .env(firstEnvironment)
                         .build(), vpcStack101, networkingBasicSubnets102);
+
+        NatGatewayStack106 natGatewayStack106 =
+                new NatGatewayStack106(app, "workout-106-nat-gtw",
+                StackProps.builder()
+                        .env(firstEnvironment)
+                        .build(), vpcStack101, networkingBasicSubnets102, bastionStack105);
     }
 }
 
