@@ -6,11 +6,13 @@ import org.jetbrains.annotations.NotNull;
 import software.amazon.awscdk.Stack;
 import software.amazon.awscdk.StackProps;
 import software.amazon.awscdk.services.ec2.*;
+import software.amazon.awscdk.services.iam.CfnInstanceProfile;
 import software.constructs.Construct;
 
 import java.util.Arrays;
 import java.util.Collections;
 
+import static gmi.workouts.common.CommonIAM.createCommonEC2InstanceProfile;
 import static gmi.workouts.utils.TagsHelper.createCommonTags;
 
 public class BastionStack105 extends Stack {
@@ -84,8 +86,8 @@ public class BastionStack105 extends Stack {
                 .tags(createCommonTags("net-sg-private-105")).build();
     }
     private void createAndAttachRouteTableToPublicSubnet(VpcStack101 vpcStack101, CfnSubnet publicSubnet, CfnInternetGateway igw) {
-        CfnRouteTable routeTable = CfnRouteTable.Builder.create(this, "public-route-table-105")
-                .tags(createCommonTags("public-route-table-105"))
+        CfnRouteTable routeTable = CfnRouteTable.Builder.create(this, "net-105-rt-1")
+                .tags(createCommonTags("net-105-rt-1"))
                 .vpcId(vpcStack101.getVpc1().getAttrVpcId())
                 .build();
 
@@ -102,8 +104,8 @@ public class BastionStack105 extends Stack {
     }
 
     private void createAndAttachRouteTableToPrivateSubnet(VpcStack101 vpcStack101, CfnSubnet privateSubnet) {
-        routeTable = CfnRouteTable.Builder.create(this, "private-route-table-105")
-                .tags(createCommonTags("private-route-table-105"))
+        routeTable = CfnRouteTable.Builder.create(this, "net-105-rt-2")
+                .tags(createCommonTags("net-105-rt-2"))
                 .vpcId(vpcStack101.getVpc1().getAttrVpcId())
                 .build();
 
@@ -146,6 +148,7 @@ public class BastionStack105 extends Stack {
 
     private void createPrivateEC2(CfnSubnet subnet, CfnSecurityGroup securityGroup) {
         IMachineImage latestAMI = MachineImage.fromSsmParameter("/aws/service/ami-amazon-linux-latest/amzn2-ami-hvm-x86_64-gp2", null);
+        CfnInstanceProfile commonEC2InstanceProfile = createCommonEC2InstanceProfile(this);
         CfnInstance.Builder.create(this, "net-105-ec2-2")
                 .imageId(latestAMI.getImage(this).getImageId())
                 .keyName("aws-workout-key")
@@ -159,6 +162,7 @@ public class BastionStack105 extends Stack {
                                         .deviceIndex("0").build()
 
                         ))
+                .iamInstanceProfile(commonEC2InstanceProfile.getInstanceProfileName())
                 .tags(createCommonTags("net-105-ec2-2"))
                 .build();
     }
