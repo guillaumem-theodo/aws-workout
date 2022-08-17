@@ -2,6 +2,8 @@ package gmi.workouts.utils;
 
 import org.jetbrains.annotations.NotNull;
 import software.amazon.awscdk.CfnTag;
+import software.amazon.awscdk.Tags;
+import software.constructs.Construct;
 
 import java.util.Arrays;
 import java.util.List;
@@ -17,5 +19,10 @@ public class TagsHelper {
         );
         cfnTags.addAll(Arrays.asList(tags));
         return cfnTags;
+    }
+
+    public static void addCommonTags(Construct construct, String name) {
+        Tags.of(construct).add("Purpose", PURPOSE);
+        Tags.of(construct).add("Name", name);
     }
 }

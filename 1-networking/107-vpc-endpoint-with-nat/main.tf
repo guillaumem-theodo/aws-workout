@@ -12,7 +12,7 @@ variable "private_route_table_105_id" {
 ## 1) create a VPC S3 Gateway Endpoint connected
 ## 2) show routes
 
-resource "aws_vpc_endpoint" "vpc-endpoint-1-107" {
+resource "aws_vpc_endpoint" "net-107-vpc-endpoint-2" {
   vpc_id = var.vpc_id
   service_name = "com.amazonaws.${var.region}.s3"
   route_table_ids = [var.private_route_table_105_id]

@@ -13,7 +13,7 @@ There are three types of NAT components:
 - **egress only Internet Gateway**: managed by AWS. **Usable ONLY for IP v6**.
 
 1️⃣ In the public subnet (``net-102-subnet-1``)
-- Create an Elastic IP `net-106-nat-gtw-eip`
+- Create an Elastic IP `net-106-eip`
 - Create a NAT Gateway (with the attached Elastic IP) `net-106-nat-gtw`
 
 2️⃣ In the private subnet (``net-102-subnet-2``)

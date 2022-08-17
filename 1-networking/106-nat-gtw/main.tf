@@ -26,34 +26,31 @@ variable "private_security_group_105_id" {
 ## 3) authorize outgoing internet traffic in Private SG (egress)
 
 ## Add NAT GATEWAY
-resource "aws_eip" "nat-gw-eip-106" {
+resource "aws_eip" "net-106-eip" {
   tags = {
     Purpose: var.dojo
-    Name: "net-106-nat-gtw-eip"
-    Description: "Elastic Public IP for NAT Gateway"
+    Name: "net-106-eip"
   }
 }
-resource "aws_nat_gateway" "nat-gtw-106" {
-  allocation_id = aws_eip.nat-gw-eip-106.id
+resource "aws_nat_gateway" "net-106-nat-gtw" {
+  allocation_id = aws_eip.net-106-eip.id
   subnet_id = var.public_subnet_102_id
 
   tags = {
     Purpose: var.dojo
     Name: "net-106-nat-gtw"
-    Description: "A NAT Gateway (ONE direction only) attached to VPC ${var.vpc_id} "
-
   }
 }
 
 
 ## Modify the private RouteTable to route outgoing traffic TO NAT Gateway
 ## The route table is associated to the private subnet
-resource "aws_route" "route-106-1" {
+resource "aws_route" "net-106-route-1" {
   route_table_id = var.private_route_table_105_id
-  nat_gateway_id = aws_nat_gateway.nat-gtw-106.id
+  nat_gateway_id = aws_nat_gateway.net-106-nat-gtw.id
   destination_cidr_block = "0.0.0.0/0"
 }
 
 output "net-106-nat-gtw-eip" {
-  value = aws_eip.nat-gw-eip-106.private_ip
+  value = aws_eip.net-106-eip.private_ip
 }

@@ -98,7 +98,7 @@ resource "aws_instance" "net-105-ec2-1" {
   instance_type = "t2.micro"
   associate_public_ip_address = true
   subnet_id = var.public_subnet_102_id
-  security_groups = [aws_security_group.net-105-sg-1.id]
+  vpc_security_group_ids = [aws_security_group.net-105-sg-1.id]
   key_name = "aws-workout-key"
 
   tags = {
@@ -161,7 +161,7 @@ resource "aws_instance" "net-105-ec2-2" {
   instance_type = "t2.micro"
   associate_public_ip_address = false
   subnet_id = var.private_subnet_102_id
-  security_groups = [aws_security_group.net-105-sg-2.id]
+  vpc_security_group_ids = [aws_security_group.net-105-sg-2.id]
   key_name = "aws-workout-key"
   iam_instance_profile = var.ec2_profile_instance_id
 

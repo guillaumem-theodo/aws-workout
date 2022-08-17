@@ -88,7 +88,7 @@ resource "aws_instance" "net-104-ec2-1" {
   instance_type = "t2.micro"
   associate_public_ip_address = true
   subnet_id = var.subnet_102_id
-  security_groups = [aws_security_group.net-104-sg.id]
+  vpc_security_group_ids = [aws_security_group.net-104-sg.id]
   key_name = "aws-workout-key"
 
   tags = {

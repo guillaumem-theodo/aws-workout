@@ -13,6 +13,8 @@ import software.constructs.Construct;
 
 import java.util.Collections;
 
+import static gmi.workouts.utils.TagsHelper.addCommonTags;
+
 public class VpcEndpointWithNatStack107 extends Stack {
 
     public VpcEndpointWithNatStack107(final Construct scope, final String id, final StackProps props,
@@ -34,10 +36,12 @@ public class VpcEndpointWithNatStack107 extends Stack {
         CfnRouteTable privateRouteTable = bastionStack105.getPrivateRouteTable();
 
         String tutorialRegion = System.getenv("TUTORIAL_REGION");
-        CfnVPCEndpoint.Builder.create(this, "vpc-endpoint-1-107")
+        CfnVPCEndpoint vpcEndpoint = CfnVPCEndpoint.Builder.create(this, "net-107-vpc-endpoint-2")
                 .vpcId(vpcStack101.getVpc().getAttrVpcId())
                 .routeTableIds(Collections.singletonList(privateRouteTable.getAttrRouteTableId()))
-                .serviceName("com.amazonaws."+tutorialRegion+".s3")
+                .serviceName("com.amazonaws." + tutorialRegion + ".s3")
                 .build();
+
+        addCommonTags(vpcEndpoint,"net-107-vpc-endpoint-2" );
     }
 }

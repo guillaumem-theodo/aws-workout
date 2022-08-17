@@ -28,17 +28,17 @@ public class NatGatewayStack106 extends Stack {
         CfnSubnet publicSubnet = subnetsStack102.getSubnet1();
         CfnRouteTable privateRouteTable = bastionStack105.getPrivateRouteTable();
 
-        CfnEIP cfnEIP = CfnEIP.Builder.create(this, "net-106-nat-gtw-eip")
-                .tags(createCommonTags("net-106-nat-gtw-eip"))
+        CfnEIP cfnEIP = CfnEIP.Builder.create(this, "net-106-eip")
+                .tags(createCommonTags("net-106-eip"))
                 .build();
 
-        CfnNatGateway natGateway = CfnNatGateway.Builder.create(this, "nat-gtw-106")
+        CfnNatGateway natGateway = CfnNatGateway.Builder.create(this, "net-106-nat-gtw")
                 .subnetId(publicSubnet.getAttrSubnetId())
                 .allocationId(cfnEIP.getAttrAllocationId())
-                .tags(createCommonTags("nat-gtw-106"))
+                .tags(createCommonTags("net-106-nat-gtw"))
                 .build();
 
-        CfnRoute.Builder.create(this, "private-route-106")
+        CfnRoute.Builder.create(this, "net-106-route-1")
                 .destinationCidrBlock("0.0.0.0/0")
                 .natGatewayId(natGateway.getRef())
                 .routeTableId(privateRouteTable.getAttrRouteTableId())
