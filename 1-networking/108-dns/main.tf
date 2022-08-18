@@ -15,7 +15,6 @@ resource "aws_vpc" "net-108-vpc-1" {
   tags = {
     Purpose: var.dojo
     Name: "net-108-vpc-1"
-    Description: "A First VPC with DNS enabled in ${var.region} Region"
   }
 }
 
@@ -27,7 +26,6 @@ resource "aws_vpc" "net-108-vpc-2" {
   tags = {
     Purpose: var.dojo
     Name: "net-108-vpc-2"
-    Description: "A Second VPC with DNS disabled in ${var.region} Region"
   }
 }
 
@@ -87,7 +85,6 @@ resource "aws_instance" "net-108-ec2-1" {
   tags = {
     Purpose: var.dojo
     Name: "net-108-ec2-1"
-    Description: "EC2 in a subnet with VPC with DNS enabled"
   }
 }
 
@@ -101,7 +98,6 @@ resource "aws_instance" "net-108-ec2-2" {
   tags = {
     Purpose: var.dojo
     Name: "net-108-ec2-2"
-    Description: "EC2 in a subnet with VPC with DNS disabled"
   }
 }
 

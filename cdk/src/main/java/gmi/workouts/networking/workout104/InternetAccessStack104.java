@@ -48,9 +48,9 @@ public class InternetAccessStack104 extends Stack {
 
     @NotNull
     private CfnSecurityGroup createSecurityGroup(VpcStack101 vpcStack101) {
-        return CfnSecurityGroup.Builder.create(this, "net-sg-104")
+        return CfnSecurityGroup.Builder.create(this, "net-104-sg")
                 .vpcId(vpcStack101.getVpc().getAttrVpcId())
-                .groupName("net-sg-104")
+                .groupName("net-104-sg")
                 .groupDescription("Security Group with ingress for PING and SSH, and egress for all")
                 .securityGroupEgress(Collections.singletonList(CfnSecurityGroup.EgressProperty.builder()
                         .cidrIp("0.0.0.0/0")
@@ -67,7 +67,7 @@ public class InternetAccessStack104 extends Stack {
                                 .ipProtocol("icmp").fromPort(-1).toPort(-1)
                                 .build()
                 ))
-                .tags(createCommonTags("net-sg-104")).build();
+                .tags(createCommonTags("net-104-sg")).build();
     }
 
     /*  ## Create a ROUTE TABLE associated to the VPC
@@ -75,18 +75,18 @@ public class InternetAccessStack104 extends Stack {
         ## The route table is associated to the subnet
 */
     private void createAndAttachRouteTableToSubnet(VpcStack101 vpcStack101, CfnSubnet subnet2, CfnInternetGateway igw) {
-        CfnRouteTable routeTable = CfnRouteTable.Builder.create(this, "route-table-104")
-                .tags(createCommonTags("route-table-104"))
+        CfnRouteTable routeTable = CfnRouteTable.Builder.create(this, "net-104-rt")
+                .tags(createCommonTags("net-104-rt"))
                 .vpcId(vpcStack101.getVpc().getAttrVpcId())
                 .build();
 
-        CfnRoute.Builder.create(this, "route-104")
+        CfnRoute.Builder.create(this, "net-104-rt-route")
                 .destinationCidrBlock("0.0.0.0/0")
                 .gatewayId(igw.getAttrInternetGatewayId())
                 .routeTableId(routeTable.getAttrRouteTableId())
                 .build();
 
-        CfnSubnetRouteTableAssociation.Builder.create(this, "rt-association-subnet1-104")
+        CfnSubnetRouteTableAssociation.Builder.create(this, "net-104-rt-association-subnet")
                 .routeTableId(routeTable.getAttrRouteTableId())
                 .subnetId(subnet2.getAttrSubnetId())
                 .build();

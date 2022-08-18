@@ -9,9 +9,17 @@ import gmi.workouts.networking.workout105.BastionStack105;
 import gmi.workouts.networking.workout106.NatGatewayStack106;
 import gmi.workouts.networking.workout107.VpcEndpointStack107;
 import gmi.workouts.networking.workout107nat.VpcEndpointWithNatStack107;
+import gmi.workouts.networking.workout108.DnsStack108;
 import software.amazon.awscdk.App;
 import software.amazon.awscdk.Environment;
+import software.amazon.awscdk.Stack;
 import software.amazon.awscdk.StackProps;
+import software.amazon.awscdk.cxapi.CloudAssembly;
+import software.amazon.awscdk.cxapi.CloudFormationStackArtifact;
+import software.constructs.IConstruct;
+import software.constructs.Node;
+
+import java.util.List;
 
 public class CdkApp {
     public static final String PURPOSE = "aws-workout";
@@ -33,7 +41,6 @@ public class CdkApp {
 
         addNetworkingTutorialsStacks(app, firstEnvironment, secondEnvironment);
 
-        app.synth();
     }
 
     private static void addNetworkingTutorialsStacks(App app, Environment firstEnvironment, Environment secondEnvironment) {
@@ -97,6 +104,12 @@ public class CdkApp {
                         vpcStack101, networkingBasicSubnets102, bastionStack105, natGatewayStack106,
                         s3ForTestsInFirstRegionStack,
                         s3ForTestsInSecondRegionStack);
+
+        DnsStack108 dnsStack108 =
+                new DnsStack108(app, "workout-108-dns",
+                StackProps.builder()
+                        .env(firstEnvironment)
+                        .build());
 
 
     }
