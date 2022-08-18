@@ -51,7 +51,7 @@ resource "aws_route_table" "net-105-rt-1" {
   }
 }
 
-resource "aws_route_table_association" "rt-association-subnet1-105" {
+resource "aws_route_table_association" "net-105-rt-association-subnet1" {
   route_table_id = aws_route_table.net-105-rt-1.id
   subnet_id = var.public_subnet_102_id
 }
@@ -110,7 +110,7 @@ resource "aws_instance" "net-105-ec2-1" {
 
 ## The route table routes all traffic from/to Bastion SUBNET
 ## The route table is associated to the private subnet
-resource "aws_route_table" "route-table-105-2" {
+resource "aws_route_table" "net-105-rt-2" {
   vpc_id = var.vpc_id
 
   tags = {
@@ -119,8 +119,8 @@ resource "aws_route_table" "route-table-105-2" {
   }
 }
 
-resource "aws_route_table_association" "rt-association-subnet2-105" {
-  route_table_id = aws_route_table.route-table-105-2.id
+resource "aws_route_table_association" "net-105-rt-association-subnet2" {
+  route_table_id = aws_route_table.net-105-rt-2.id
   subnet_id = var.private_subnet_102_id
 }
 
@@ -180,7 +180,7 @@ output "net-105-ec2-2-private-ip" {
 }
 
 output "net-105-rt-2-id" {
-  value = aws_route_table.route-table-105-2.id
+  value = aws_route_table.net-105-rt-2.id
 }
 
 output "net-105-sg-2-id" {

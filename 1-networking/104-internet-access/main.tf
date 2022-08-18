@@ -27,7 +27,7 @@ resource "aws_internet_gateway" "net-104-igw" {
 ## Create a ROUTE TABLE associated to the VPC
 ## The route table routes all traffic from/to internet through Internet gateway
 ## The route table is associated to the subnet
-resource "aws_route_table" "route-table-104" {
+resource "aws_route_table" "net-104-rt" {
   vpc_id = var.vpc_id
 
   route {
@@ -41,8 +41,8 @@ resource "aws_route_table" "route-table-104" {
   }
 }
 
-resource "aws_route_table_association" "rt-association-subnet1-104" {
-  route_table_id = aws_route_table.route-table-104.id
+resource "aws_route_table_association" "net-104-rt-association-subnet1" {
+  route_table_id = aws_route_table.net-104-rt.id
   subnet_id =  var.subnet_102_id
 }
 
@@ -104,5 +104,5 @@ output "net-104-sg-id" {
   value = aws_security_group.net-104-sg.id
 }
 output "net-104-rt-id" {
-  value = aws_route_table.route-table-104.id
+  value = aws_route_table.net-104-rt.id
 }
