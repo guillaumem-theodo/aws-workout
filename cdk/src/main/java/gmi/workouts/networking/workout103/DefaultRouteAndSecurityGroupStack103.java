@@ -2,23 +2,21 @@ package gmi.workouts.networking.workout103;
 
 import gmi.workouts.networking.workout101.VpcStack101;
 import gmi.workouts.networking.workout102.BasicSubnetsStack102;
-import org.jetbrains.annotations.NotNull;
-import software.amazon.awscdk.CfnTag;
 import software.amazon.awscdk.Stack;
 import software.amazon.awscdk.StackProps;
-import software.amazon.awscdk.services.ec2.*;
+import software.amazon.awscdk.services.ec2.CfnInstance;
+import software.amazon.awscdk.services.ec2.CfnSubnet;
+import software.amazon.awscdk.services.ec2.IMachineImage;
+import software.amazon.awscdk.services.ec2.MachineImage;
 import software.constructs.Construct;
 
-import java.util.Arrays;
 import java.util.Collections;
-import java.util.List;
 
-import static gmi.workouts.CdkApp.PURPOSE;
 import static gmi.workouts.utils.TagsHelper.createCommonTags;
 
 public class DefaultRouteAndSecurityGroupStack103 extends Stack {
 
-    private static final String LINUX_LATEST_AMZN_2_AMI_HVM_X_86_64_GP_2 = "/aws/service/ami-amazon-linux-latest/amzn2-ami-hvm-x86_64-gp2";
+    public static final String LINUX_LATEST_AMZN_2_AMI_HVM_X_86_64_GP_2 = "/aws/service/ami-amazon-linux-latest/amzn2-ami-hvm-x86_64-gp2";
 
     /*
     ######################################################################################
@@ -40,7 +38,7 @@ public class DefaultRouteAndSecurityGroupStack103 extends Stack {
                 .imageId(latestAMI.getImage(this).getImageId())
                 .keyName("aws-workout-key")
                 .instanceType("t2.micro")
-                .networkInterfaces(
+                .networkInterfaces(  // This is the way to add a public IP to the EC2 -> create a network interface (ENI)
                         Collections.singletonList(
                                 CfnInstance.NetworkInterfaceProperty.builder()
                                         .subnetId(subnet2.getAttrSubnetId())

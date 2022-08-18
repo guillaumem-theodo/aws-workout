@@ -9,11 +9,10 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
+import static gmi.workouts.networking.workout103.DefaultRouteAndSecurityGroupStack103.LINUX_LATEST_AMZN_2_AMI_HVM_X_86_64_GP_2;
 import static gmi.workouts.utils.TagsHelper.createCommonTags;
 
 public class DnsStack108 extends Stack {
-    private static final String LINUX_LATEST_AMZN_2_AMI_HVM_X_86_64_GP_2 = "/aws/service/ami-amazon-linux-latest/amzn2-ami-hvm-x86_64-gp2";
-
     public DnsStack108(final Construct scope, final String id, final StackProps props) {
         super(scope, id, props);
 

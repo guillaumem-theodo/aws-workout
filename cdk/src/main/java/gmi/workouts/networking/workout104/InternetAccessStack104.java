@@ -11,6 +11,7 @@ import software.constructs.Construct;
 import java.util.Arrays;
 import java.util.Collections;
 
+import static gmi.workouts.networking.workout103.DefaultRouteAndSecurityGroupStack103.LINUX_LATEST_AMZN_2_AMI_HVM_X_86_64_GP_2;
 import static gmi.workouts.utils.TagsHelper.createCommonTags;
 
 /*
@@ -24,8 +25,6 @@ import static gmi.workouts.utils.TagsHelper.createCommonTags;
 ######################################################################################
  */
 public class InternetAccessStack104 extends Stack {
-
-    private static final String LINUX_LATEST_AMZN_2_AMI_HVM_X_86_64_GP_2 = "/aws/service/ami-amazon-linux-latest/amzn2-ami-hvm-x86_64-gp2";
 
     public InternetAccessStack104(final Construct scope, final String id, final StackProps props,
                                   VpcStack101 vpcStack101,

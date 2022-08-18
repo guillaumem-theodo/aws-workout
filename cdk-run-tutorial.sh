@@ -10,5 +10,5 @@ TUTORIAL_DIR=$1
 TUTORIAL_KEY=$(basename "$TUTORIAL_DIR")
 
 source ./backend-env.conf
-echo "Applying Tutorial '$TUTORIAL_KEY' CDK in $TUTORIAL_REGION"
-(cd cdk || exit; cdk deploy "workout-$TUTORIAL_KEY")
+echo "Applying CDK Tutorial '$TUTORIAL_KEY' in $TUTORIAL_REGION region"
+(cd cdk || exit; cdk deploy -f "workout-$TUTORIAL_KEY")

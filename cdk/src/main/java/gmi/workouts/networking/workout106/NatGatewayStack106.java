@@ -3,14 +3,10 @@ package gmi.workouts.networking.workout106;
 import gmi.workouts.networking.workout101.VpcStack101;
 import gmi.workouts.networking.workout102.BasicSubnetsStack102;
 import gmi.workouts.networking.workout105.BastionStack105;
-import org.jetbrains.annotations.NotNull;
 import software.amazon.awscdk.Stack;
 import software.amazon.awscdk.StackProps;
 import software.amazon.awscdk.services.ec2.*;
 import software.constructs.Construct;
-
-import java.util.Arrays;
-import java.util.Collections;
 
 import static gmi.workouts.utils.TagsHelper.createCommonTags;
 
