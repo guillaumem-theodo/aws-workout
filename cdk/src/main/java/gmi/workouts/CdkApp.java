@@ -10,6 +10,7 @@ import gmi.workouts.networking.workout106.NatGatewayStack106;
 import gmi.workouts.networking.workout107.VpcEndpointStack107;
 import gmi.workouts.networking.workout107nat.VpcEndpointWithNatStack107;
 import gmi.workouts.networking.workout108.DnsStack108;
+import gmi.workouts.networking.workout109.VpcPeeringStack109;
 import software.amazon.awscdk.App;
 import software.amazon.awscdk.Environment;
 import software.amazon.awscdk.Stack;
@@ -40,6 +41,8 @@ public class CdkApp {
                 .build();
 
         addNetworkingTutorialsStacks(app, firstEnvironment, secondEnvironment);
+
+        app.synth();
 
     }
 
@@ -111,7 +114,10 @@ public class CdkApp {
                         .env(firstEnvironment)
                         .build());
 
-
-    }
+        VpcPeeringStack109 vpcPeeringStack109 =
+                new VpcPeeringStack109(app, "workout-109-vpc-peering",
+                StackProps.builder()
+                        .env(firstEnvironment)
+                        .build());   }
 }
 

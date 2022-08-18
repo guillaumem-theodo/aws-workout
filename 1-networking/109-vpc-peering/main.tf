@@ -1,7 +1,7 @@
 ########################################################################################################################
 
 ######################################################################################
-## Create four VPCs with DNS settings
+## Create three VPCs with DNS settings
 ## 1) create three new  VPC with AWS DNS enabled
 ## 2) create EC2 in each VPC
 ## 3) change routes in route tables
