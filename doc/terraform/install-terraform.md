@@ -17,7 +17,7 @@
 Terraform stores its states in a S3 bucket. 
 
 - Choose an AWS S3 bucket name. It must be worldwide unique. E.g. gmi-2022-aws-workouts
-- Put the name of the bucket and the region of the bucket in the `backend-env.conf` [file](../backend-env.conf)
+- Put the name of the bucket and the region of the bucket in the `backend-env.conf` [file](../../backend-env.conf)
 
 ```
 export TERRAFORM_BACKEND_S3_BUCKET_REGION=<PUT YOUR BUCKET REGION HERE>
