@@ -11,4 +11,4 @@ TUTORIAL_KEY=$(basename "$TUTORIAL_DIR")
 
 source ./backend-env.conf
 echo "Deleting CDK Tutorial '$TUTORIAL_KEY' in $TUTORIAL_REGION region"
-(cd cdk || exit; cdk destroy -f "workout-$TUTORIAL_KEY")
+(cd cdk || exit; cdk destroy -f --require-approval never "workout-$TUTORIAL_KEY")

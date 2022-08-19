@@ -28,7 +28,7 @@ public class VpcEndpointWithNatStack107 extends Stack {
         addDependency(vpcStack101);
         addDependency(subnetsStack102);
         addDependency(bastionStack105);
-        addDependency(natGatewayStack106);
+        addDependency(natGatewayStack106); // ADD a NAT Gateway and a route to internet
 
         addDependency(s3ForTestsInFirstRegionStack);
         addDependency(s3ForTestsInSecondRegionStack);

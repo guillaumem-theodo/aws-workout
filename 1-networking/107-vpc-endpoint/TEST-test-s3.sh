@@ -5,7 +5,7 @@ ec2_2_private_ip=$(aws ec2 describe-instances --region "$TUTORIAL_REGION"  --pro
 
 ## DISPLAY the Routes to S3
 echo "✅ S3 ls in region '$TUTORIAL_REGION' -> Success. It goes through VPC endpoint"
-ssh -i ./aws-workout-key-pair.pem -o ConnectTimeout=10 -J ec2-user@"$ec2_1_public_ip" ec2-user@"$ec2_2_private_ip" aws s3 ls --region=$TUTORIAL_REGION s3://$TUTORIAL_UNIQUE_KEY-s3-bucket-1
+ssh -i ./aws-workout-key-pair.pem -o ConnectTimeout=10 -o StrictHostKeyChecking=no -J ec2-user@"$ec2_1_public_ip" ec2-user@"$ec2_2_private_ip" aws s3 ls --region=$TUTORIAL_REGION s3://$TUTORIAL_UNIQUE_KEY-s3-bucket-1
 
-echo "❌ S3 ls in another region '$TUTORIAL_ANOTHER_REGION' -> Should fail (timeout). Since there is no route to internet and no NAT Gateway"
-ssh -i ./aws-workout-key-pair.pem -o ConnectTimeout=10 -J ec2-user@"$ec2_1_public_ip" ec2-user@"$ec2_2_private_ip" aws --cli-read-timeout=3 --cli-connect-timeout=3 s3 ls --region=$TUTORIAL_ANOTHER_REGION  s3://$TUTORIAL_UNIQUE_KEY-s3-bucket-2
+echo "❌ S3 ls in another region '$TUTORIAL_ANOTHER_REGION' -> Should fail (timeout). Since there is no route to internet and no NAT Gateway. VPC Endpoint is regional"
+ssh -i ./aws-workout-key-pair.pem -o ConnectTimeout=10 -o StrictHostKeyChecking=no -J ec2-user@"$ec2_1_public_ip" ec2-user@"$ec2_2_private_ip" aws --cli-read-timeout=3 --cli-connect-timeout=3 s3 ls --region=$TUTORIAL_ANOTHER_REGION  s3://$TUTORIAL_UNIQUE_KEY-s3-bucket-2

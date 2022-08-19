@@ -11,7 +11,7 @@ import software.constructs.Construct;
 import java.util.Arrays;
 import java.util.Collections;
 
-import static gmi.workouts.networking.workout103.DefaultRouteAndSecurityGroupStack103.LINUX_LATEST_AMZN_2_AMI_HVM_X_86_64_GP_2;
+import static gmi.workouts.utils.EC2Helper.LINUX_LATEST_AMZN_2_AMI_HVM_X_86_64_GP_2;
 import static gmi.workouts.utils.TagsHelper.createCommonTags;
 
 /*
@@ -33,22 +33,53 @@ public class InternetAccessStack104 extends Stack {
         addDependency(vpcStack101);
         addDependency(subnetsStack102);
 
+        CfnVPC vpc = vpcStack101.getVpc();
         CfnSubnet subnet2 = subnetsStack102.getSubnet2();
 
-        CfnInternetGateway igw = createAndAttachInternetGateway(vpcStack101);
+        CfnInternetGateway igw = createAndAttachInternetGateway(vpc);
 
-        createAndAttachRouteTableToSubnet(vpcStack101, subnet2, igw);
+        createAndAttachRouteTableToSubnet(vpc, subnet2, igw);
 
-        CfnSecurityGroup securityGroup = createSecurityGroup(vpcStack101);
+        CfnSecurityGroup securityGroup = createSecurityGroup(vpc);
 
         createEC2(subnet2, securityGroup);
 
     }
-
     @NotNull
-    private CfnSecurityGroup createSecurityGroup(VpcStack101 vpcStack101) {
+    private CfnInternetGateway createAndAttachInternetGateway(CfnVPC cfnVPC) {
+        CfnInternetGateway internetGateway = CfnInternetGateway.Builder.create(this, "net-104-igw")
+                .tags(createCommonTags("net-104-igw"))
+                .build();
+
+        CfnVPCGatewayAttachment.Builder.create(this, "net-104-igw-vpc-attachment")
+                .vpcId(cfnVPC.getAttrVpcId())
+                .internetGatewayId(internetGateway.getAttrInternetGatewayId())
+                .build();
+
+        return internetGateway;
+    }
+
+    private void createAndAttachRouteTableToSubnet(CfnVPC vpc, CfnSubnet subnet, CfnInternetGateway igw) {
+        CfnRouteTable routeTable = CfnRouteTable.Builder.create(this, "net-104-rt")
+                .vpcId(vpc.getAttrVpcId())
+                .tags(createCommonTags("net-104-rt"))
+                .build();
+
+        CfnRoute.Builder.create(this, "net-104-rt-route-to-internet")
+                .destinationCidrBlock("0.0.0.0/0")
+                .gatewayId(igw.getAttrInternetGatewayId())
+                .routeTableId(routeTable.getAttrRouteTableId())
+                .build();
+
+        CfnSubnetRouteTableAssociation.Builder.create(this, "net-104-rt-association-subnet")
+                .routeTableId(routeTable.getAttrRouteTableId())
+                .subnetId(subnet.getAttrSubnetId())
+                .build();
+    }
+    @NotNull
+    private CfnSecurityGroup createSecurityGroup(CfnVPC vpc) {
         return CfnSecurityGroup.Builder.create(this, "net-104-sg")
-                .vpcId(vpcStack101.getVpc().getAttrVpcId())
+                .vpcId(vpc.getAttrVpcId())
                 .groupName("net-104-sg")
                 .groupDescription("Security Group with ingress for PING and SSH, and egress for all")
                 .securityGroupEgress(Collections.singletonList(CfnSecurityGroup.EgressProperty.builder()
@@ -67,40 +98,6 @@ public class InternetAccessStack104 extends Stack {
                                 .build()
                 ))
                 .tags(createCommonTags("net-104-sg")).build();
-    }
-
-    /*  ## Create a ROUTE TABLE associated to the VPC
-        ## The route table routes all traffic from/to internet through Internet gateway
-        ## The route table is associated to the subnet
-*/
-    private void createAndAttachRouteTableToSubnet(VpcStack101 vpcStack101, CfnSubnet subnet2, CfnInternetGateway igw) {
-        CfnRouteTable routeTable = CfnRouteTable.Builder.create(this, "net-104-rt")
-                .tags(createCommonTags("net-104-rt"))
-                .vpcId(vpcStack101.getVpc().getAttrVpcId())
-                .build();
-
-        CfnRoute.Builder.create(this, "net-104-rt-route")
-                .destinationCidrBlock("0.0.0.0/0")
-                .gatewayId(igw.getAttrInternetGatewayId())
-                .routeTableId(routeTable.getAttrRouteTableId())
-                .build();
-
-        CfnSubnetRouteTableAssociation.Builder.create(this, "net-104-rt-association-subnet")
-                .routeTableId(routeTable.getAttrRouteTableId())
-                .subnetId(subnet2.getAttrSubnetId())
-                .build();
-    }
-
-    private CfnInternetGateway createAndAttachInternetGateway(VpcStack101 vpcStack101) {
-        CfnInternetGateway internetGateway = CfnInternetGateway.Builder.create(this, "net-104-igw")
-                .tags(createCommonTags("net-104-igw")).build();
-
-        CfnVPCGatewayAttachment.Builder.create(this, "net-104-igw-vpc-attachment")
-                .vpcId(vpcStack101.getVpc().getAttrVpcId())
-                .internetGatewayId(internetGateway.getAttrInternetGatewayId())
-                .build();
-
-        return internetGateway;
     }
 
     private void createEC2(CfnSubnet subnet, CfnSecurityGroup securityGroup) {

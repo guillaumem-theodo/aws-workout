@@ -2,6 +2,7 @@ package gmi.workouts.networking.workout103;
 
 import gmi.workouts.networking.workout101.VpcStack101;
 import gmi.workouts.networking.workout102.BasicSubnetsStack102;
+import gmi.workouts.utils.EC2Helper;
 import software.amazon.awscdk.Stack;
 import software.amazon.awscdk.StackProps;
 import software.amazon.awscdk.services.ec2.CfnInstance;
@@ -15,8 +16,6 @@ import java.util.Collections;
 import static gmi.workouts.utils.TagsHelper.createCommonTags;
 
 public class DefaultRouteAndSecurityGroupStack103 extends Stack {
-
-    public static final String LINUX_LATEST_AMZN_2_AMI_HVM_X_86_64_GP_2 = "/aws/service/ami-amazon-linux-latest/amzn2-ami-hvm-x86_64-gp2";
 
     /*
     ######################################################################################
@@ -32,7 +31,7 @@ public class DefaultRouteAndSecurityGroupStack103 extends Stack {
 
         CfnSubnet subnet2 = basicSubnetsStack102.getSubnet2();
 
-        IMachineImage latestAMI = MachineImage.fromSsmParameter(LINUX_LATEST_AMZN_2_AMI_HVM_X_86_64_GP_2, null);
+        IMachineImage latestAMI = MachineImage.fromSsmParameter(EC2Helper.LINUX_LATEST_AMZN_2_AMI_HVM_X_86_64_GP_2, null);
 
         CfnInstance.Builder.create(this, "net-103-ec2-1")
                 .imageId(latestAMI.getImage(this).getImageId())

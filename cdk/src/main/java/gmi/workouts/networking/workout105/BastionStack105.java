@@ -13,7 +13,7 @@ import java.util.Arrays;
 import java.util.Collections;
 
 import static gmi.workouts.common.CommonIAM.createCommonEC2InstanceProfile;
-import static gmi.workouts.networking.workout103.DefaultRouteAndSecurityGroupStack103.LINUX_LATEST_AMZN_2_AMI_HVM_X_86_64_GP_2;
+import static gmi.workouts.utils.EC2Helper.createEC2;
 import static gmi.workouts.utils.TagsHelper.createCommonTags;
 
 /*
@@ -40,26 +40,71 @@ public class BastionStack105 extends Stack {
         addDependency(vpcStack101);
         addDependency(subnetsStack102);
 
+
+        CfnVPC vpc = vpcStack101.getVpc();
         CfnSubnet privateSubnet = subnetsStack102.getSubnet2();
         CfnSubnet publicSubnet = subnetsStack102.getSubnet1();
 
-        CfnInternetGateway igw = createAndAttachInternetGateway(vpcStack101);
+        CfnInternetGateway igw = createAndAttachInternetGateway(vpc);
 
-        createAndAttachRouteTableToPublicSubnet(vpcStack101, publicSubnet, igw);
-        createAndAttachRouteTableToPrivateSubnet(vpcStack101, privateSubnet);
+        createAndAttachRouteTableToPublicSubnet(vpc, publicSubnet, igw);
+        createAndAttachRouteTableToPrivateSubnet(vpc, privateSubnet);
 
-        CfnSecurityGroup publicSecurityGroup = createSecurityGroup(vpcStack101);
-        CfnSecurityGroup privateSecurityGroup = createPrivateSecurityGroup(vpcStack101, publicSecurityGroup);
+        CfnSecurityGroup publicSecurityGroup = createSecurityGroup(vpc);
+        CfnSecurityGroup privateSecurityGroup = createPrivateSecurityGroup(vpc, publicSecurityGroup);
 
-        createBastionEC2(publicSubnet, publicSecurityGroup);
-        createPrivateEC2(privateSubnet, privateSecurityGroup);
+        CfnInstanceProfile commonEC2InstanceProfile = createCommonEC2InstanceProfile(this);
+        createBastionEC2(publicSubnet, publicSecurityGroup, commonEC2InstanceProfile);
+        createPrivateEC2(privateSubnet, privateSecurityGroup, commonEC2InstanceProfile);
 
+    }
+    private CfnInternetGateway createAndAttachInternetGateway(CfnVPC vpc) {
+        CfnInternetGateway internetGateway = CfnInternetGateway.Builder.create(this, "net-105-igw")
+                .tags(createCommonTags("net-105-igw"))
+                .build();
+
+        CfnVPCGatewayAttachment.Builder.create(this, "net-105-igw-vpc-attachment")
+                .vpcId(vpc.getAttrVpcId())
+                .internetGatewayId(internetGateway.getAttrInternetGatewayId())
+                .build();
+
+        return internetGateway;
+    }
+
+    private void createAndAttachRouteTableToPublicSubnet(CfnVPC vpc, CfnSubnet publicSubnet, CfnInternetGateway igw) {
+        CfnRouteTable routeTable = CfnRouteTable.Builder.create(this, "net-105-rt-1")
+                .tags(createCommonTags("net-105-rt-1"))
+                .vpcId(vpc.getAttrVpcId())
+                .build();
+
+        CfnRoute.Builder.create(this, "net-105-rt-1-internet")
+                .destinationCidrBlock("0.0.0.0/0")
+                .gatewayId(igw.getAttrInternetGatewayId())
+                .routeTableId(routeTable.getAttrRouteTableId())
+                .build();
+
+        CfnSubnetRouteTableAssociation.Builder.create(this, "net-105-rt-1-association-subnet1")
+                .routeTableId(routeTable.getAttrRouteTableId())
+                .subnetId(publicSubnet.getAttrSubnetId())
+                .build();
+    }
+
+    private void createAndAttachRouteTableToPrivateSubnet(CfnVPC vpc, CfnSubnet privateSubnet) {
+        routeTable = CfnRouteTable.Builder.create(this, "net-105-rt-2")
+                .tags(createCommonTags("net-105-rt-2"))
+                .vpcId(vpc.getAttrVpcId())
+                .build();
+
+        CfnSubnetRouteTableAssociation.Builder.create(this, "net-105-rt-2-association-subnet")
+                .routeTableId(routeTable.getAttrRouteTableId())
+                .subnetId(privateSubnet.getAttrSubnetId())
+                .build();
     }
 
     @NotNull
-    private CfnSecurityGroup createSecurityGroup(VpcStack101 vpcStack101) {
+    private CfnSecurityGroup createSecurityGroup(CfnVPC vpc) {
         return CfnSecurityGroup.Builder.create(this, "net-105-sg-1")
-                .vpcId(vpcStack101.getVpc().getAttrVpcId())
+                .vpcId(vpc.getAttrVpcId())
                 .groupName("net-105-sg-1")
                 .groupDescription("Security Group with ingress for PING and SSH, and egress for all")
                 .securityGroupEgress(Collections.singletonList(CfnSecurityGroup.EgressProperty.builder()
@@ -81,11 +126,11 @@ public class BastionStack105 extends Stack {
     }
 
     @NotNull
-    private CfnSecurityGroup createPrivateSecurityGroup(VpcStack101 vpcStack101, CfnSecurityGroup publicSecurityGroup) {
+    private CfnSecurityGroup createPrivateSecurityGroup(CfnVPC vpc, CfnSecurityGroup publicSecurityGroup) {
         return CfnSecurityGroup.Builder.create(this, "net-105-sg-2")
-                .vpcId(vpcStack101.getVpc().getAttrVpcId())
+                .vpcId(vpc.getAttrVpcId())
                 .groupName("net-105-sg-2")
-                .groupDescription("Security Group with ingress for all protocol FROM other security group ONLY, egress ALL")
+                .groupDescription("Security Group with ingress for all protocols FROM other security group ONLY, egress ALL")
                 .securityGroupEgress(Collections.singletonList(CfnSecurityGroup.EgressProperty.builder()
                         .cidrIp("0.0.0.0/0")
                         .ipProtocol("-1").fromPort(0).toPort(0)
@@ -99,87 +144,13 @@ public class BastionStack105 extends Stack {
                 ))
                 .tags(createCommonTags("net-105-sg-2")).build();
     }
-    private void createAndAttachRouteTableToPublicSubnet(VpcStack101 vpcStack101, CfnSubnet publicSubnet, CfnInternetGateway igw) {
-        CfnRouteTable routeTable = CfnRouteTable.Builder.create(this, "net-105-rt-1")
-                .tags(createCommonTags("net-105-rt-1"))
-                .vpcId(vpcStack101.getVpc().getAttrVpcId())
-                .build();
 
-        CfnRoute.Builder.create(this, "net-105-rt-1-internet")
-                .destinationCidrBlock("0.0.0.0/0")
-                .gatewayId(igw.getAttrInternetGatewayId())
-                .routeTableId(routeTable.getAttrRouteTableId())
-                .build();
-
-        CfnSubnetRouteTableAssociation.Builder.create(this, "net-105-rt-1-association-subnet1")
-                .routeTableId(routeTable.getAttrRouteTableId())
-                .subnetId(publicSubnet.getAttrSubnetId())
-                .build();
+    private void createBastionEC2(CfnSubnet subnet, CfnSecurityGroup securityGroup, CfnInstanceProfile instanceProfile) {
+        createEC2(this, subnet, securityGroup, "net-105-ec2-1", true, instanceProfile);
     }
 
-    private void createAndAttachRouteTableToPrivateSubnet(VpcStack101 vpcStack101, CfnSubnet privateSubnet) {
-        routeTable = CfnRouteTable.Builder.create(this, "net-105-rt-2")
-                .tags(createCommonTags("net-105-rt-2"))
-                .vpcId(vpcStack101.getVpc().getAttrVpcId())
-                .build();
-
-        CfnSubnetRouteTableAssociation.Builder.create(this, "net-105-rt-1-association-subnet2")
-                .routeTableId(routeTable.getAttrRouteTableId())
-                .subnetId(privateSubnet.getAttrSubnetId())
-                .build();
-    }
-
-    //    ## Internet Gateway is a BIDIRECTIONAL gateway to Internet from VPC
-    private CfnInternetGateway createAndAttachInternetGateway(VpcStack101 vpcStack101) {
-        CfnInternetGateway internetGateway = CfnInternetGateway.Builder.create(this, "net-105-igw")
-                .tags(createCommonTags("net-105-igw")).build();
-
-        CfnVPCGatewayAttachment.Builder.create(this, "net-105-igw-vpc-attachment")
-                .vpcId(vpcStack101.getVpc().getAttrVpcId())
-                .internetGatewayId(internetGateway.getAttrInternetGatewayId())
-                .build();
-
-        return internetGateway;
-    }
-
-    private void createBastionEC2(CfnSubnet subnet, CfnSecurityGroup securityGroup) {
-        IMachineImage latestAMI = MachineImage.fromSsmParameter(LINUX_LATEST_AMZN_2_AMI_HVM_X_86_64_GP_2, null);
-        CfnInstance.Builder.create(this, "net-105-ec2-1")
-                .imageId(latestAMI.getImage(this).getImageId())
-                .keyName("aws-workout-key")
-                .instanceType("t2.micro")
-                .networkInterfaces(
-                        Collections.singletonList(
-                                CfnInstance.NetworkInterfaceProperty.builder()
-                                        .subnetId(subnet.getAttrSubnetId())
-                                        .associatePublicIpAddress(true)
-                                        .groupSet(Collections.singletonList(securityGroup.getAttrGroupId()))
-                                        .deviceIndex("0").build()
-
-                        ))
-                .tags(createCommonTags("net-105-ec2-1"))
-                .build();
-    }
-
-    private void createPrivateEC2(CfnSubnet subnet, CfnSecurityGroup securityGroup) {
-        IMachineImage latestAMI = MachineImage.fromSsmParameter(LINUX_LATEST_AMZN_2_AMI_HVM_X_86_64_GP_2, null);
-        CfnInstanceProfile commonEC2InstanceProfile = createCommonEC2InstanceProfile(this);
-        CfnInstance.Builder.create(this, "net-105-ec2-2")
-                .imageId(latestAMI.getImage(this).getImageId())
-                .keyName("aws-workout-key")
-                .instanceType("t2.micro")
-                .networkInterfaces(
-                        Collections.singletonList(
-                                CfnInstance.NetworkInterfaceProperty.builder()
-                                        .subnetId(subnet.getAttrSubnetId())
-                                        .associatePublicIpAddress(false)
-                                        .groupSet(Collections.singletonList(securityGroup.getAttrGroupId()))
-                                        .deviceIndex("0").build()
-
-                        ))
-                .iamInstanceProfile(commonEC2InstanceProfile.getInstanceProfileName())
-                .tags(createCommonTags("net-105-ec2-2"))
-                .build();
+    private void createPrivateEC2(CfnSubnet subnet, CfnSecurityGroup securityGroup, CfnInstanceProfile instanceProfile) {
+        createEC2(this, subnet, securityGroup, "net-105-ec2-2", false, instanceProfile);
     }
 
     public CfnRouteTable getPrivateRouteTable() {

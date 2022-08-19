@@ -9,7 +9,7 @@ variable "private_route_table_105_id" {
 
 ######################################################################################
 ## Show how to reach AWS services (example: S3 bucket) using (or not) a VPC Endpoint
-## 1) create a VPC S3 Gateway Endpoint connected
+## 1) create a VPC S3 Gateway Endpoint
 ## 2) show routes
 
 resource "aws_vpc_endpoint" "net-107-vpc-endpoint-1" {

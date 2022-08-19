@@ -6,7 +6,7 @@ nat_gtw_private_ip=$(aws ec2 describe-addresses --region "$TUTORIAL_REGION" --pr
 
 ## DISPLAY the Routes to S3
 echo "✅ Trace Route to S3 in region '$TUTORIAL_REGION' -> Should NOT go through NAT gateway $nat_gtw_private_ip"
-ssh -i ./aws-workout-key-pair.pem -o ConnectTimeout=10 -J ec2-user@"$ec2_1_public_ip" ec2-user@"$ec2_2_private_ip" sudo traceroute -n -T -p 443 -m 6 "s3.$TUTORIAL_REGION.amazonaws.com"
+ssh -i ./aws-workout-key-pair.pem -o ConnectTimeout=10 -o StrictHostKeyChecking=no -J ec2-user@"$ec2_1_public_ip" ec2-user@"$ec2_2_private_ip" sudo traceroute -n -T -p 443 -m 6 "s3.$TUTORIAL_REGION.amazonaws.com"
 
 echo "✅ Trace Route to S3 in another region -> SHOULD go through 👉 NAT gateway $nat_gtw_private_ip"
-ssh -i ./aws-workout-key-pair.pem -o ConnectTimeout=10 -J ec2-user@"$ec2_1_public_ip" ec2-user@"$ec2_2_private_ip" sudo traceroute -n -T -p 443 -m 6 "s3.$TUTORIAL_ANOTHER_REGION.amazonaws.com"
+ssh -i ./aws-workout-key-pair.pem -o ConnectTimeout=10 -o StrictHostKeyChecking=no -J ec2-user@"$ec2_1_public_ip" ec2-user@"$ec2_2_private_ip" sudo traceroute -n -T -p 443 -m 6 "s3.$TUTORIAL_ANOTHER_REGION.amazonaws.com"
