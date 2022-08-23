@@ -2,6 +2,7 @@ package gmi.workouts;
 
 import gmi.workouts.common.S3ForTestsStack;
 import gmi.workouts.computing.workout201.SimpleEC2Stack201;
+import gmi.workouts.computing.workout202.EC2UserDataStack202;
 import gmi.workouts.networking.workout101.VpcStack101;
 import gmi.workouts.networking.workout102.BasicSubnetsStack102;
 import gmi.workouts.networking.workout103.DefaultRouteAndSecurityGroupStack103;
@@ -45,6 +46,11 @@ public class CdkApp {
 
     private static void addComputingTutorialsStacks(App app, Environment firstEnvironment, Environment secondEnvironment) {
         SimpleEC2Stack201 simpleEC2Stack201 = new SimpleEC2Stack201(app, "workout-201-basic-ec2",
+                StackProps.builder()
+                        .env(firstEnvironment)
+                        .build(), vpcStack101, networkingBasicSubnets102);
+
+        EC2UserDataStack202 ec2UserDataStack202 = new EC2UserDataStack202(app, "workout-202-user-data",
                 StackProps.builder()
                         .env(firstEnvironment)
                         .build(), vpcStack101, networkingBasicSubnets102);

@@ -34,14 +34,18 @@ echo "Hello World from $(hostname -f)" > /var/www/html/index.html
 <br>
 
 ## Your success
-🏁 Once installed, the EC2 should be able to serve your html page.
+🏁 Once installed, the EC2 should be able to serve your html page.  
+You may have to wait some seconds, so the EC2 can download, update, install and start httpd service during bootstrap.
+
 - ✅ Test that you can see the webpage from your browser
 - ✅ Use Curl to test the page
+- ✅ Check that HTTPD service started in script is running using `service httpd status` command in EC2
 
 You can use following commands to check your mission success
 ```shell
 ./launch.sh 2-computing/202-user-data/TEST-curl.sh
 ./launch.sh 2-computing/202-user-data/TEST-ssh-public-ec2.sh
+./launch.sh 2-computing/202-user-data/TEST-check-httpd-service.sh
 ```
 
 ## Materials
