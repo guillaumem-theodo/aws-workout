@@ -1,6 +1,7 @@
 package gmi.workouts;
 
 import gmi.workouts.common.S3ForTestsStack;
+import gmi.workouts.computing.workout201.SimpleEC2Stack201;
 import gmi.workouts.networking.workout101.VpcStack101;
 import gmi.workouts.networking.workout102.BasicSubnetsStack102;
 import gmi.workouts.networking.workout103.DefaultRouteAndSecurityGroupStack103;
@@ -13,19 +14,14 @@ import gmi.workouts.networking.workout108.DnsStack108;
 import gmi.workouts.networking.workout109.VpcPeeringStack109;
 import software.amazon.awscdk.App;
 import software.amazon.awscdk.Environment;
-import software.amazon.awscdk.Stack;
 import software.amazon.awscdk.StackProps;
-import software.amazon.awscdk.cxapi.CloudAssembly;
-import software.amazon.awscdk.cxapi.CloudFormationStackArtifact;
-import software.constructs.IConstruct;
-import software.constructs.Node;
-
-import java.util.List;
 
 public class CdkApp {
     public static final String PURPOSE = "aws-workout";
     public static final String TUTORIAL_REGION = System.getenv("TUTORIAL_REGION");
     public static final String TUTORIAL_ANOTHER_REGION = System.getenv("TUTORIAL_ANOTHER_REGION");
+    private static VpcStack101 vpcStack101;
+    private static BasicSubnetsStack102 networkingBasicSubnets102;
 
     public static void main(final String[] args) {
         App app = new App();
@@ -41,18 +37,26 @@ public class CdkApp {
                 .build();
 
         addNetworkingTutorialsStacks(app, firstEnvironment, secondEnvironment);
+        addComputingTutorialsStacks(app, firstEnvironment, secondEnvironment);
 
         app.synth();
 
     }
 
+    private static void addComputingTutorialsStacks(App app, Environment firstEnvironment, Environment secondEnvironment) {
+        SimpleEC2Stack201 simpleEC2Stack201 = new SimpleEC2Stack201(app, "workout-201-basic-ec2",
+                StackProps.builder()
+                        .env(firstEnvironment)
+                        .build(), vpcStack101, networkingBasicSubnets102);
+    }
+
     private static void addNetworkingTutorialsStacks(App app, Environment firstEnvironment, Environment secondEnvironment) {
-        VpcStack101 vpcStack101 = new VpcStack101(app, "workout-101-basic-vpc",
+        vpcStack101 = new VpcStack101(app, "workout-101-basic-vpc",
                 StackProps.builder()
                         .env(firstEnvironment)
                         .build());
 
-        BasicSubnetsStack102 networkingBasicSubnets102 = new BasicSubnetsStack102(app, "workout-102-basic-subnets",
+        networkingBasicSubnets102 = new BasicSubnetsStack102(app, "workout-102-basic-subnets",
                 StackProps.builder()
                         .env(firstEnvironment)
                         .build(), vpcStack101);

@@ -15,6 +15,7 @@ import static gmi.workouts.common.CommonIAM.createCommonEC2InstanceProfile;
 import static gmi.workouts.utils.EC2Helper.createEC2;
 import static gmi.workouts.utils.InternetGatewayHelper.createAndAttachInternetGateway;
 import static gmi.workouts.utils.InternetGatewayHelper.createAndAttachRouteTableToSubnet;
+import static gmi.workouts.utils.SecurityGroupHelper.DefaultPort.SSH;
 import static gmi.workouts.utils.SecurityGroupHelper.createSecurityGroup;
 import static gmi.workouts.utils.TagsHelper.createCommonTags;
 
@@ -54,9 +55,9 @@ public class DnsStack108 extends Stack {
                 .tags(createCommonTags("net-108-subnet-2")).build();
 
         CfnInternetGateway internetGateway = createAndAttachInternetGateway(this, vpc1, "net-108-igw");
-        createAndAttachRouteTableToSubnet(this, vpc1, subnet1, internetGateway, "net-108-rt");
+        createAndAttachRouteTableToSubnet(this, vpc1, subnet1, internetGateway, "net-108-rt-1");
 
-        CfnSecurityGroup sg1 = createSecurityGroup(this, vpc1, "net-108-sg-1");
+        CfnSecurityGroup sg1 = createSecurityGroup(this, vpc1, "net-108-sg-1", SSH);
         CfnSecurityGroup sg2 = createSecurityGroup(this, vpc2, "net-108-sg-2");
 
 
@@ -64,8 +65,6 @@ public class DnsStack108 extends Stack {
         createEC2InVPC(subnet1, sg1, "net-108-ec2-1", commonEC2InstanceProfile);
         createEC2InVPC(subnet2, sg2, "net-108-ec2-2", commonEC2InstanceProfile);
     }
-
-
 
 
     private void createEC2InVPC(CfnSubnet subnet, CfnSecurityGroup securityGroup, String name, CfnInstanceProfile instanceProfile) {

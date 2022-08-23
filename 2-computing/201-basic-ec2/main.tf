@@ -1,24 +1,10 @@
 ########################################################################################################################
-provider "aws" {
-  region = var.region
-  profile = "aws-workout"
+variable "vpc_id" {
+  type = string
 }
 
-data "terraform_remote_state" "vpc-101" {
-  backend = "s3"
-  config = {
-    bucket = var.tf-s3-bucket
-    region = var.tf-s3-region
-    key = "101-basic-vpc"
-  }
-}
-data "terraform_remote_state" "subnets-102" {
-  backend = "s3"
-  config = {
-    bucket = var.tf-s3-bucket
-    key = "102-basic-subnets"
-    region = var.tf-s3-region
-  }
+variable "subnet_102_id" {
+  type = string
 }
 
 ######################################################################################
@@ -29,35 +15,34 @@ data "terraform_remote_state" "subnets-102" {
 ## 4) associate the security group to the EC2 instances
 
 ## Internet Gateway is a BIDIRECTIONAL gateway to Internet from VPC
-resource "aws_internet_gateway" "igw-201" {
-  vpc_id = data.terraform_remote_state.vpc-101.outputs.net-101-vpc-id
+resource "aws_internet_gateway" "cpu-201-igw" {
+  vpc_id = var.vpc_id
   tags = {
     Purpose: var.dojo
     Name: "cpu-201-igw"
-    Description: "An Internet Gateway (both direction) attached to VPC ${data.terraform_remote_state.vpc-101.outputs.net-101-vpc-id} "
   }
 }
 
 ## Create a ROUTE TABLE associated to the VPC
 ## The route table routes all traffic from/to internet through Internet gateway
 ## The route table is associated to the subnet
-resource "aws_route_table" "route-table-201" {
-  vpc_id = data.terraform_remote_state.vpc-101.outputs.net-101-vpc-id
+resource "aws_route_table" "cpu-201-rt-1" {
+  vpc_id = var.vpc_id
 
   route {
     cidr_block = "0.0.0.0/0"
-    gateway_id = aws_internet_gateway.igw-201.id
+    gateway_id = aws_internet_gateway.cpu-201-igw.id
   }
 
   tags = {
     Purpose: var.dojo
-    Name: "cpu-201-rt"
+    Name: "cpu-201-rt-1"
   }
 }
 
-resource "aws_route_table_association" "rt-association-subnet1-201" {
-  route_table_id = aws_route_table.route-table-201.id
-  subnet_id = data.terraform_remote_state.subnets-102.outputs.net-102-subnet-1-id
+resource "aws_route_table_association" "cpu-201-rt-association-subnet1" {
+  route_table_id = aws_route_table.cpu-201-rt-1.id
+  subnet_id = var.subnet_102_id
 }
 
 ## Create a SECURITY GROUP associated to the VPC
@@ -65,8 +50,8 @@ resource "aws_route_table_association" "rt-association-subnet1-201" {
 ## The SG allows all incoming PORT 22 traffic from your IP
 ## The SG allows all incoming PORT ICMP (ping) traffic from your IP
 
-resource "aws_security_group" "sg-201" {
-  vpc_id = data.terraform_remote_state.vpc-101.outputs.net-101-vpc-id
+resource "aws_security_group" "cpu-201-sg" {
+  vpc_id = var.vpc_id
 
   ## ALL HTTP, SSH AND PING INCOMING TRAFFIC ENTERING THE SECURITY GROUP
   ingress {
@@ -104,27 +89,26 @@ resource "aws_security_group" "sg-201" {
 ## CREATE an EC2 inside the subnet (with the associated route table) and inside the security group
 ## As a consequence the EC2 should be reachable (ping and SSH) from internet
 ## And EC2 can initiate traffic to internet (curl...)
-resource "aws_instance" "public-ec2" {
+resource "aws_instance" "cpu-201-ec2-1" {
   ami = data.aws_ami.amazon-linux.image_id
   instance_type = "t2.micro"
   associate_public_ip_address = true
-  subnet_id = data.terraform_remote_state.subnets-102.outputs.net-102-subnet-1-id
-  security_groups = [aws_security_group.sg-201.id]
+  subnet_id = var.subnet_102_id
+  vpc_security_group_ids = [aws_security_group.cpu-201-sg.id]
   key_name = "aws-workout-key"
 
   tags = {
     Purpose: var.dojo
     Name: "cpu-201-ec2-1"
-    Description: "EC2 in a subnet with a route and a security group (in first subnet)"
   }
 }
 
 output "cpu-201-ec2-1-public-ip" {
-  value = aws_instance.public-ec2.public_ip
+  value = aws_instance.cpu-201-ec2-1.public_ip
 }
 output "cpu-201-sg-id" {
-  value = aws_security_group.sg-201.id
+  value = aws_security_group.cpu-201-sg.id
 }
 output "cpu-201-rt-id" {
-  value = aws_route_table.route-table-201.id
+  value = aws_route_table.cpu-201-rt-1.id
 }

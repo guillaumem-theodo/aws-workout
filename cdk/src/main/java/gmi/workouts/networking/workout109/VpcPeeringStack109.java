@@ -12,6 +12,7 @@ import static gmi.workouts.common.CommonIAM.createCommonEC2InstanceProfile;
 import static gmi.workouts.utils.EC2Helper.createEC2;
 import static gmi.workouts.utils.InternetGatewayHelper.createAndAttachInternetGateway;
 import static gmi.workouts.utils.InternetGatewayHelper.createAndAttachRouteTableToSubnet;
+import static gmi.workouts.utils.SecurityGroupHelper.DefaultPort.SSH;
 import static gmi.workouts.utils.SecurityGroupHelper.createSecurityGroup;
 import static gmi.workouts.utils.TagsHelper.createCommonTags;
 
@@ -70,7 +71,25 @@ public class VpcPeeringStack109 extends Stack {
 
         CfnSecurityGroup securityGroup1 = createSecurityGroup(this, vpc1, "net-109-sg-1");
         CfnSecurityGroup securityGroup2 = createSecurityGroup(this, vpc2, "net-109-sg-2");
-        CfnSecurityGroup securityGroup3 = createSecurityGroup(this, vpc3, "net-109-sg-3");
+        CfnSecurityGroup securityGroup3 = createSecurityGroup(this, vpc3, "net-109-sg-3", SSH);
+
+        CfnSecurityGroupIngress.Builder.create(this, "net-109-sg-3-2")
+                .groupId(securityGroup3.getAttrGroupId())
+                .fromPort(0).toPort(0).ipProtocol("-1")
+                .cidrIp(vpc2.getCidrBlock())
+                .build();
+
+        CfnSecurityGroupIngress.Builder.create(this, "nnet-109-sg-2-3")
+                .groupId(securityGroup2.getAttrGroupId())
+                .fromPort(0).toPort(0).ipProtocol("-1")
+                .cidrIp(vpc3.getCidrBlock())
+                .build();
+
+        CfnSecurityGroupIngress.Builder.create(this, "net-109-sg-1-2")
+                .groupId(securityGroup1.getAttrGroupId())
+                .fromPort(0).toPort(0).ipProtocol("-1")
+                .cidrIp(vpc2.getCidrBlock())
+                .build();
 
         CfnInstanceProfile commonEC2InstanceProfile = createCommonEC2InstanceProfile(this);
         createEC2(this, subnet1, securityGroup1, "net-109-ec2-1", true, commonEC2InstanceProfile);
