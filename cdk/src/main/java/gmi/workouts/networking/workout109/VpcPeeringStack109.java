@@ -80,6 +80,7 @@ public class VpcPeeringStack109 extends Stack {
         createVpcPeering(vpc3, vpc2, routeTable3, routeTable2, securityGroup3, securityGroup2, "net-109-peering-3-2");
 
         CfnVPCPeeringConnection vpcPeering = createVpcPeering(vpc2, vpc1, routeTable2, routeTable1, securityGroup2, securityGroup1, "net-109-peering-2-1");
+
         new AllowVPCPeeringDNSResolution(this, "net-109-peering-2-1-options", vpcPeering);
     }
 

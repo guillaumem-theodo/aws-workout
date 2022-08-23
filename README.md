@@ -1,7 +1,7 @@
 # 👨‍🎓 AWS Workout 👨‍🎓
 ## Small and Quick Hands-on on AWS basic principles ##
 
-This repository contains a set of workouts to train yourself on AWS services, using CDK or Terraform IAC frameworks.
+This repository contains a set of workouts to train yourself on AWS services, using **CDK** or **Terraform** IAC frameworks.
 
 ### 🏛 Tutorials organisation 🏛 
 

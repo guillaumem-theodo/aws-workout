@@ -2,6 +2,7 @@ package gmi.workouts.networking.workout105;
 
 import gmi.workouts.networking.workout101.VpcStack101;
 import gmi.workouts.networking.workout102.BasicSubnetsStack102;
+import gmi.workouts.utils.IpChecker;
 import org.jetbrains.annotations.NotNull;
 import software.amazon.awscdk.Stack;
 import software.amazon.awscdk.StackProps;
@@ -21,7 +22,7 @@ import static gmi.workouts.utils.TagsHelper.createCommonTags;
 ## Create a BASTION architecture
 ## 1) create an internet gateway (IGW) for public access to/from internet (for the public subnet)
 ## 2) create a route table and a route to 0.0.0.0 via IGW (associated to the public subnet)
-## 3) authorize PING and SSH in a security group (for the public subnet)
+## 3) authorize PING and SSH in a security group (for the public subnet) FROM your IP address only
 ## 4) associate the security group to the BASTION EC2 instance
 ## 5) create a route table from bastion subnet to private subnet (local vpc)
 ## 6) authorize all traffic from bastion subnet (only) TO private subnet (within a security group)
@@ -103,6 +104,8 @@ public class BastionStack105 extends Stack {
 
     @NotNull
     private CfnSecurityGroup createSecurityGroup(CfnVPC vpc) {
+        String myIPAddressCIDR = IpChecker.getMyIPAddressCIDR();
+
         return CfnSecurityGroup.Builder.create(this, "net-105-sg-1")
                 .vpcId(vpc.getAttrVpcId())
                 .groupName("net-105-sg-1")
@@ -114,11 +117,11 @@ public class BastionStack105 extends Stack {
                 ))
                 .securityGroupIngress(Arrays.asList(
                         CfnSecurityGroup.IngressProperty.builder()
-                                .cidrIp("0.0.0.0/0")
+                                .cidrIp(myIPAddressCIDR)
                                 .ipProtocol("tcp").fromPort(22).toPort(22)
                                 .build(),
                         CfnSecurityGroup.IngressProperty.builder()
-                                .cidrIp("0.0.0.0/0")
+                                .cidrIp(myIPAddressCIDR)
                                 .ipProtocol("icmp").fromPort(-1).toPort(-1)
                                 .build()
                 ))
@@ -156,4 +159,6 @@ public class BastionStack105 extends Stack {
     public CfnRouteTable getPrivateRouteTable() {
         return routeTable;
     }
+
+
 }

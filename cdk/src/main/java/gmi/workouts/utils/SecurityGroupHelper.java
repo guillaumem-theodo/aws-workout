@@ -10,7 +10,7 @@ import java.util.Collections;
 import static gmi.workouts.utils.TagsHelper.createCommonTags;
 
 public class SecurityGroupHelper {
-    public static CfnSecurityGroup createSecurityGroup(Construct scope, CfnVPC vpc, final String name) {
+    public static CfnSecurityGroup createSecurityGroup(Construct scope, CfnVPC vpc, String name) {
         return CfnSecurityGroup.Builder.create(scope, name)
                 .vpcId(vpc.getAttrVpcId())
                 .groupName(name)

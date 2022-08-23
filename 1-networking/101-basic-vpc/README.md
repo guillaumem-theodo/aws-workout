@@ -5,11 +5,26 @@
 The VPC must be able to support at least 40000 private IP addresses.
 The **size** of the VPC is chosen using the IPv4 CIDR parameter of the VPC (at creation).
 
-🏁 Test the Created VPC using AWS CLI `aws ec2 describe-vpcs`  
+<div align="center">
+<img src="./doc/101-basic-vpc.png" width="500" alt="Image of VPC">
+</div>
+<br>
+
+## Your success
+🏁 Test the created VPC using AWS CLI `aws ec2 describe-vpcs`  
 - You can use filtering capabilities on aws [CLI command](https://docs.aws.amazon.com/cli/latest/userguide/cli-usage-filter.html) to select the VPC. E.g: ``--filters Name=tag:Name,Values=net-101-vpc``
 - You can use querying capabilities to see only some attributes. E.g: ``--query 'Vpcs[0].CidrBlock'``
+- ✅ Display the created VPC ('net-101-vpc')
+- ✅ Display the CIDR address range in this VPC
 
-## Support
+You can use ``TEST-display-create-vpc.sh`` command to check your mission success
+```shell
+./launch.sh 1-networking/101-basic-vpc/TEST-display-created-vpc.sh 
+```
+
+## Materials
+[Doc AWS](https://docs.aws.amazon.com/vpc/latest/userguide/VPC_Subnets.html)
+
 #### RFC 1918 Blocks of IP addresses
 You can use https://www.ipaddressguide.com/cidr to see and compute blocks of Ips
 
@@ -45,10 +60,4 @@ Example: 10.0.0.0/16 -> 65531 IP addresses
 N must be within [16, 24]
 ```
 
-
 NB: you can add additional IPv4 CIDR blocks afterward (up to 5 blocks of IPs).
-
-[Doc AWS](https://docs.aws.amazon.com/vpc/latest/userguide/VPC_Subnets.html)
-
-
-![Image of VPC](./doc/101-basic-vpc.png)

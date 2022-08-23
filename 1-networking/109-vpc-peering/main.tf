@@ -16,7 +16,6 @@ resource "aws_vpc" "net-109-vpc-1" {
   tags = {
     Purpose: var.dojo
     Name: "net-109-vpc-1"
-    Description: "A First VPC in ${var.region} Region"
   }
 }
 
@@ -28,7 +27,6 @@ resource "aws_vpc" "net-109-vpc-2" {
   tags = {
     Purpose: var.dojo
     Name: "net-109-vpc-2"
-    Description: "A Second VPC in ${var.region} Region"
   }
 }
 
@@ -40,7 +38,6 @@ resource "aws_vpc" "net-109-vpc-3" {
   tags = {
     Purpose: var.dojo
     Name: "net-109-vpc-3"
-    Description: "A Third VPC in ${var.region} Region"
   }
 }
 
