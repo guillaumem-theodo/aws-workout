@@ -40,7 +40,7 @@ resource "aws_route_table" "cpu-203-rt" {
   }
 }
 
-resource "aws_route_table_association" "rt-association-subnet1-202" {
+resource "aws_route_table_association" "cpu-203-rt-association-subnet" {
   route_table_id = aws_route_table.cpu-203-rt.id
   subnet_id = var.subnet_102_id
 }

@@ -15,7 +15,7 @@ There are two types of **VPC Endpoints**:
   - Behind the scene, these gateway endpoints relies on Route Tables and PrefixLists (a list of IPs managed by AWS)
 - **Interface VPC Endpoints** for ALL OTHERS services. 
   - Behind the scene, these interface endpoints deal with Elastic Network Interface (ENI) and AWS PrivateLink
-  - Interface VPC Endpoints can be used with your own services
+  - NB: Interface VPC Endpoints can be used with your own services (AWS Endpoint Service)
 
 (this difference is important for many certification questions 😉)
 
