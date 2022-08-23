@@ -1,75 +1,119 @@
 ########################################################################################################################
-provider "aws" {
-  region = var.region
-  profile = "aws-workout"
+variable "vpc_id" {
+  type = string
 }
 
-data "terraform_remote_state" "vpc-101" {
-  backend = "s3"
-  config = {
-    bucket = var.tf-s3-bucket
-    region = var.tf-s3-region
-    key = "101-basic-vpc"
-  }
-}
-data "terraform_remote_state" "subnets-102" {
-  backend = "s3"
-  config = {
-    bucket = var.tf-s3-bucket
-    key = "102-basic-subnets"
-    region = var.tf-s3-region
-  }
-}
-data "terraform_remote_state" "user-data-202" {
-  backend = "s3"
-  config = {
-    bucket = var.tf-s3-bucket
-    region = var.tf-s3-region
-    key = "202-user-data"
-  }
+variable "subnet_102_id" {
+  type = string
 }
 
-resource "aws_s3_bucket" "s3-bucket-1-203" {
-  bucket = "unique-name-s3-bucket-1-203"   ## Change Unique Name
+######################################################################################
+## Create an access FROM and TO internet on our EC2 (public EC2)
+## 1) create an internet gateway (IGW)
+## 2) create a route table and a route to 0.0.0.0 via IGW
+## 3) authorize HTTP, PING and SSH in a security group
+## 4) associate the security group to the EC2 instances
+
+## Internet Gateway is a BIDIRECTIONAL gateway to Internet from VPC
+resource "aws_internet_gateway" "cpu-203-igw" {
+  vpc_id = var.vpc_id
   tags = {
     Purpose: var.dojo
-    Name: "cpu-203-s3-bucket-1"
-    Description: "First Bucket for DOJO 203"
+    Name: "cpu-203-igw"
   }
 }
 
-resource "aws_s3_bucket_object" "s3-bucket-object-1-203" {
-  bucket = aws_s3_bucket.s3-bucket-1-203.bucket
-  key    = "a_file_uploaded_in_bucket"
-  source = "README.md"
-  etag = filemd5("README.md")
+## Create a ROUTE TABLE associated to the VPC
+## The route table routes all traffic from/to internet through Internet gateway
+## The route table is associated to the subnet
+resource "aws_route_table" "cpu-203-rt" {
+  vpc_id = var.vpc_id
+
+  route {
+    cidr_block = "0.0.0.0/0"
+    gateway_id = aws_internet_gateway.cpu-203-igw.id
+  }
+
+  tags = {
+    Purpose: var.dojo
+    Name: "cpu-203-rt"
+  }
+}
+
+resource "aws_route_table_association" "rt-association-subnet1-202" {
+  route_table_id = aws_route_table.cpu-203-rt.id
+  subnet_id = var.subnet_102_id
+}
+
+## Create a SECURITY GROUP associated to the VPC
+## The SG allows all incoming PORT 80 traffic from everywhere
+## The SG allows all incoming PORT 22 traffic from your IP
+## The SG allows all incoming PORT ICMP (ping) traffic from your IP
+
+resource "aws_security_group" "cpu-203-sg-1" {
+  vpc_id = var.vpc_id
+
+  ## ALL HTTP, SSH AND PING INCOMING TRAFFIC ENTERING THE SECURITY GROUP
+  ingress {
+    from_port = 22
+    protocol = "tcp"
+    to_port = 22
+    cidr_blocks = ["${module.myip.address}/32" ]
+  }
+  ingress {
+    from_port = 80
+    protocol = "tcp"
+    to_port = 80
+    cidr_blocks = ["0.0.0.0/0" ]
+  }
+  ingress {
+    from_port = -1
+    protocol = "icmp"
+    to_port = -1
+    cidr_blocks = ["${module.myip.address}/32" ]
+  }
+  ## ALL OUTGOING TRAFFIC INITIATED FROM THE SECURITY GROUP
+  egress {
+    from_port        = 0
+    to_port          = 0
+    protocol         = "-1"
+    cidr_blocks      = ["0.0.0.0/0"]
+  }
+
+  tags = {
+    Purpose: var.dojo
+    Name: "cpu-203-sg-1"
+  }
 }
 
 ## CREATE an EC2 inside the subnet (with the associated route table) and inside the security group
 ## As a consequence the EC2 should be reachable (ping and SSH) from internet
 ## And EC2 can initiate traffic to internet (curl...)
-resource "aws_instance" "public-ec2-1" {
+resource "aws_instance" "cpu-203-ec2-1" {
   ami = data.aws_ami.amazon-linux.image_id
   instance_type = "t2.micro"
   associate_public_ip_address = true
-  subnet_id = data.terraform_remote_state.subnets-102.outputs.net-102-subnet-1-id
-  security_groups = [data.terraform_remote_state.user-data-202.outputs.cpu-202-sg-id]
+  subnet_id = var.subnet_102_id
+  vpc_security_group_ids = [aws_security_group.cpu-203-sg-1.id]
   key_name = "aws-workout-key"
   user_data = file("ec2-apache-install.sh")
 
   tags = {
     Purpose: var.dojo
     Name: "cpu-203-ec2-1"
-    Description: "EC2 with User-Data THAT uses Meta-Data"
   }
 }
 
 output "cpu-203-ec2-1-public-ip" {
-  value = aws_instance.public-ec2-1.public_ip
+  value = aws_instance.cpu-203-ec2-1.public_ip
+}
+output "cpu-203-sg-id" {
+  value = aws_security_group.cpu-203-sg-1.id
+}
+output "cpu-203-rt-id" {
+  value = aws_route_table.cpu-203-rt.id
 }
 output "cpu-203-ec2-1-id" {
-  value = aws_instance.public-ec2-1.id
+  value = aws_instance.cpu-203-ec2-1.id
 }
-output "cpu-203-s3-arn" {
-  value = aws_s3_bucket.s3-bucket-1-203.arn
-}
+
