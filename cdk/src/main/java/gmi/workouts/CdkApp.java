@@ -4,6 +4,7 @@ import gmi.workouts.common.S3ForTestsStack;
 import gmi.workouts.computing.workout201.SimpleEC2Stack201;
 import gmi.workouts.computing.workout202.EC2UserDataStack202;
 import gmi.workouts.computing.workout203.EC2MetaDataStack203;
+import gmi.workouts.computing.workout204.EC2RoleStack204;
 import gmi.workouts.networking.workout101.VpcStack101;
 import gmi.workouts.networking.workout102.BasicSubnetsStack102;
 import gmi.workouts.networking.workout103.DefaultRouteAndSecurityGroupStack103;
@@ -24,6 +25,8 @@ public class CdkApp {
     public static final String TUTORIAL_ANOTHER_REGION = System.getenv("TUTORIAL_ANOTHER_REGION");
     private static VpcStack101 vpcStack101;
     private static BasicSubnetsStack102 networkingBasicSubnets102;
+    private static S3ForTestsStack s3ForTestsInFirstRegionStack;
+    private static S3ForTestsStack s3ForTestsInSecondRegionStack;
 
     public static void main(final String[] args) {
         App app = new App();
@@ -60,6 +63,12 @@ public class CdkApp {
                 StackProps.builder()
                         .env(firstEnvironment)
                         .build(), vpcStack101, networkingBasicSubnets102);
+
+        EC2RoleStack204 ec2RoleStack204 = new EC2RoleStack204(app, "workout-204-ec2-role",
+                StackProps.builder()
+                        .env(firstEnvironment)
+                        .build(), vpcStack101, networkingBasicSubnets102,
+                s3ForTestsInFirstRegionStack, s3ForTestsInSecondRegionStack);
     }
 
     private static void addNetworkingTutorialsStacks(App app, Environment firstEnvironment, Environment secondEnvironment) {
@@ -97,11 +106,11 @@ public class CdkApp {
                         .env(firstEnvironment)
                         .build(), vpcStack101, networkingBasicSubnets102, bastionStack105);
 
-        S3ForTestsStack s3ForTestsInFirstRegionStack = new S3ForTestsStack(app, "common-s3-region-1",
+        s3ForTestsInFirstRegionStack = new S3ForTestsStack(app, "common-s3-region-1",
                 StackProps.builder()
                                 .env(firstEnvironment)
                                 .build(), "s3-bucket-1");
-        S3ForTestsStack s3ForTestsInSecondRegionStack = new S3ForTestsStack(app, "common-s3-region-2",
+        s3ForTestsInSecondRegionStack = new S3ForTestsStack(app, "common-s3-region-2",
                 StackProps.builder()
                                 .env(secondEnvironment)
                                 .build(), "s3-bucket-2");
