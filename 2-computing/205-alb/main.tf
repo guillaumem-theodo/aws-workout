@@ -1,35 +1,28 @@
 ########################################################################################################################
-provider "aws" {
-  region = var.region
-  profile = "aws-workout"
+variable "vpc_id" {
+  type = string
 }
 
-data "terraform_remote_state" "vpc-101" {
-  backend = "s3"
-  config = {
-    bucket = var.tf-s3-bucket
-    region = var.tf-s3-region
-    key = "101-basic-vpc"
-  }
+variable "subnet1_102_id" {
+  type = string
 }
-
-data "terraform_remote_state" "subnets-102" {
-  backend = "s3"
-  config = {
-    bucket = var.tf-s3-bucket
-    key = "102-basic-subnets"
-    region = var.tf-s3-region
-  }
+variable "subnet2_102_id" {
+  type = string
 }
-
+variable "subnet3_102_id" {
+  type = string
+}
+variable "subnet4_102_id" {
+  type = string
+}
 ######################################################################################
 ## BASTION EC2
-resource "aws_instance" "bastion-ec2-1" {
+resource "aws_instance" "cpu-205-ec2-bastion-1" {
   ami = data.aws_ami.amazon-linux.image_id
   instance_type = "t2.micro"
   associate_public_ip_address = true
-  subnet_id = data.terraform_remote_state.subnets-102.outputs.net-102-subnet-1-id
-  security_groups = [aws_security_group.sg-205-bastion.id]
+  subnet_id = var.subnet2_102_id
+  vpc_security_group_ids = [aws_security_group.cpu-205-sg-2.id]
   key_name = "aws-workout-key"
 
   tags = {
@@ -44,13 +37,13 @@ resource "aws_instance" "bastion-ec2-1" {
 ## with one TargetGroup grouping the 3 workers
 ## with one ListerRule that forward all HTTP traffic to the TargetGroup (with the 3 targets)
 
-resource "aws_lb" "my_alb" {
+resource "aws_lb" "cpu-205-alb" {
   internal           = false
   load_balancer_type = "application"
-  security_groups    = [aws_security_group.sg-205-public.id]
+  security_groups    = [aws_security_group.cpu-205-sg-1.id]
   subnets            = [
-    data.terraform_remote_state.subnets-102.outputs.net-102-subnet-1-id,
-    data.terraform_remote_state.subnets-102.outputs.net-102-subnet-2-id
+    var.subnet1_102_id,
+    var.subnet2_102_id,
   ]
 
   enable_deletion_protection = false
@@ -62,35 +55,35 @@ resource "aws_lb" "my_alb" {
   }
 }
 
-resource "aws_lb_target_group" "my_alb_target_group" {
+resource "aws_lb_target_group" "cpu-205-alb-target-group" {
   port     = 80
   protocol = "HTTP"
-  vpc_id = data.terraform_remote_state.vpc-101.outputs.net-101-vpc-id
+  vpc_id = var.vpc_id
 }
 
-resource "aws_lb_target_group_attachment" "target_1" {
-  target_group_arn = aws_lb_target_group.my_alb_target_group.arn
-  target_id        = aws_instance.worker-ec2-1.id
+resource "aws_lb_target_group_attachment" "cpu-205-alb-target-1" {
+  target_group_arn = aws_lb_target_group.cpu-205-alb-target-group.arn
+  target_id        = aws_instance.cpu-205-ec2-worker-1.id
   port             = 80
 }
 
-resource "aws_lb_target_group_attachment" "target_2" {
-  target_group_arn = aws_lb_target_group.my_alb_target_group.arn
-  target_id        = aws_instance.worker-ec2-2.id
+resource "aws_lb_target_group_attachment" "cpu-205-alb-target-2" {
+  target_group_arn = aws_lb_target_group.cpu-205-alb-target-group.arn
+  target_id        = aws_instance.cpu-205-ec2-worker-2.id
   port             = 80
 }
-resource "aws_lb_target_group_attachment" "target_3" {
-  target_group_arn = aws_lb_target_group.my_alb_target_group.arn
-  target_id        = aws_instance.worker-ec2-3.id
+resource "aws_lb_target_group_attachment" "cpu-205-alb-target-3" {
+  target_group_arn = aws_lb_target_group.cpu-205-alb-target-group.arn
+  target_id        = aws_instance.cpu-205-ec2-worker-3.id
   port             = 80
 }
 
 resource "aws_lb_listener" "my_alb_listener" {
-  load_balancer_arn = aws_lb.my_alb.arn
+  load_balancer_arn = aws_lb.cpu-205-alb.arn
   port = 80
   default_action {
     type             = "forward"
-    target_group_arn = aws_lb_target_group.my_alb_target_group.arn
+    target_group_arn = aws_lb_target_group.cpu-205-alb-target-group.arn
   }
 }
 

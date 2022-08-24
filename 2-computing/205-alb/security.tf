@@ -2,8 +2,8 @@
 ## CREATE A PUBLIC SECURITY GROUP, for ALB
 ## - Allowing all HTTP traffic from Internet --> Needed to receive requests from internet
 ## - Allowing all traffic TO everywhere --> Needed to be able to forward calls to WORKERS
-resource "aws_security_group" "sg-205-public" {
-  vpc_id = data.terraform_remote_state.vpc-101.outputs.net-101-vpc-id
+resource "aws_security_group" "cpu-205-sg-1" {
+  vpc_id = var.vpc_id
 
   ingress {
     from_port = 80
@@ -21,14 +21,13 @@ resource "aws_security_group" "sg-205-public" {
   tags = {
     Purpose: var.dojo
     Name: "cpu-205-sg-1"
-    Description: "Security Group for ALB"
   }
 }
 
 ######################################################################################
 ## CREATE A BASTION SECURITY GROUP Allowing all SSH traffic from myIP
-resource "aws_security_group" "sg-205-bastion" {
-  vpc_id = data.terraform_remote_state.vpc-101.outputs.net-101-vpc-id
+resource "aws_security_group" "cpu-205-sg-2" {
+  vpc_id = var.vpc_id
 
   ingress {
     from_port = 22
@@ -45,7 +44,6 @@ resource "aws_security_group" "sg-205-bastion" {
   tags = {
     Purpose: var.dojo
     Name: "cpu-205-sg-2"
-    Description: "Security Group for Bastion EC2"
   }
 }
 
@@ -53,20 +51,20 @@ resource "aws_security_group" "sg-205-bastion" {
 ## CREATE A PRIVATE SECURITY GROUP
 ## - Allowing all HTTP traffic from Previous Security Group
 ## - Allowing all outgoing traffic to internet --> Needed for Yum Update, Yum Install
-resource "aws_security_group" "sg-205-private" {
-  vpc_id = data.terraform_remote_state.vpc-101.outputs.net-101-vpc-id
+resource "aws_security_group" "cpu-205-sg-3" {
+  vpc_id = var.vpc_id
 
   ingress {
     from_port = 80
     protocol = "tcp"
     to_port = 80
-    security_groups = [aws_security_group.sg-205-public.id]
+    security_groups = [aws_security_group.cpu-205-sg-1.id]
   }
   ingress {
     from_port = 22
     protocol = "tcp"
     to_port = 22
-    security_groups = [aws_security_group.sg-205-bastion.id]
+    security_groups = [aws_security_group.cpu-205-sg-2.id]
   }
   egress {
     from_port        = 0
@@ -78,6 +76,5 @@ resource "aws_security_group" "sg-205-private" {
   tags = {
     Purpose: var.dojo
     Name: "cpu-205-sg-3"
-    Description: "Security Group for Workers"
   }
 }
