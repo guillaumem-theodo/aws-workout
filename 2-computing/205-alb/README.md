@@ -1,6 +1,6 @@
 ## ALB - Application Load Balancer
 
-⭐⭐⭐ (more complexe)️ ⭐⭐⭐
+⭐⭐⭐ (more complex Tutorial)️ ⭐⭐⭐
 
 Application Load Balancer is a component to balance the incoming traffic to many components (EC2s for example).
 This way ALB spreads the traffic load over many content providers.
@@ -16,13 +16,14 @@ ALB architecture is made of:
 - Target Group: a group of targets
 - Listener: a listener that redirect the traffic of a given protocol to a target group.
 
-👉 From the 101-basic-vpc and 102-basic-subnets
+## Your mission
 
+👉 From the 101-basic-vpc and 102-basic-subnets
 You will have to combine many topics seen in previous exercises.
 
 1️⃣ Create a BASTION architecture
 
-- with 1 Bastion EC2 located in subnet `net-102-subnet-1`
+- with 1 Bastion EC2 located in subnet `net-102-subnet-2`
 - the Bastion EC2 must be launched within a Security Group `cpu-205-sg-2`
 - the Bastion Security Group `cpu-205-sg-2` must allow incoming SSH from your laptop only
 - the Bastion Security Group `cpu-205-sg-2` must allow outgoing traffic to everywhere
@@ -31,11 +32,14 @@ You will have to combine many topics seen in previous exercises.
 
 - the workers must be located in private subnets `net-102-subnet-3` and/or `net-102-subnet-4` (put 2 workers in one subnet, the remaining worker in the other subnet)
 - the workers do no need public IPs (since they are in a private subnet)  
+- each worker must download and install HTTPD package like in tutorial `202`
+- each worker must be created and boot after the create of the NAT Gateway (to be able to access internet through NAT)
 - each worker must start an HTTPD server like in tutorial `202`
 - the workers must be launched within a Private Security Group `cpu-205-sg-3`
 - the Private Security Group `cpu-205-sg-3` must allow incoming HTTP from the Public Security Group `cpu-205-sg-1`
 - the Private Security Group `cpu-205-sg-3` must allow incoming SSH from the Bastion Security Group `cpu-205-sg-2`
 - the Private Security Group `cpu-205-sg-3`  must allow outgoing traffic to everywhere
+
 
 3️⃣ Install Internet Gateway for Internet access (in and out)
 
@@ -58,10 +62,10 @@ Workers need to upload and install HTTPD yum packages. They need outgoing intern
 - the public security group `cpu-205-sg-1` must allow incoming HTTP from everywhere
 - the public security group `cpu-205-sg-1` must allow any outgoing traffic to everywhere
 - create a **Target Group**
-- attach the three EC2 workers as **Targets** to the Target Group
+- attach the three EC2 workers as **HTTP Targets** to the Target Group
 - add a **listener on port 80** on the ALB, that forward traffic to the Target Group
 
-### Organise your files
+### Organise your files (Terraform Tutorial)
 You can split the TERRAFORM file, in multiple files in the same directory.
 You can create:
 - a `main.tf` file with the ALB
@@ -69,12 +73,30 @@ You can create:
 - a `security.tf` file with the security groups
 - a `workers.tf` file with the EC2
 
-🏁 Test that the ALB dispatchs the requests to the three workers
+### Organise your files (CDK Tutorial)
+You can split the CDK stack, in multiple Nested Stack
+You can create:
+- one Nested Stack for `Networking` (VPC, subnets, NAT, IGW, Routes, SecurityGroups...)
+- one Nested Stack for `ALB` (ALB, TargetGroups, Workers, Listeners, Bastion...)
+- one Parent Stack as the root stack
+
+<div align="center">
+<img src="./doc/205-alb.png" width="800" alt="ALB">
+</div>
+<br>
+
+## Your success
+🏁 Test that the ALB dispatches the requests to the three workers
 - ✅ When doing a CURL on the ALB's URL, the response comes from one of the workers (each time different)
 
-[Doc AWS](https://docs.aws.amazon.com/elasticloadbalancing/latest/application/introduction.html)
+You can use following commands to check your mission success
+```shell
+./launch.sh 2-computing/205-alb/TEST-ssh-public-ec2.sh
+./launch.sh 2-computing/205-alb/TEST-load-balancer.sh
+```
 
-![Image of VPC](./doc/205-alb.png)
+## Materials
+[Doc AWS](https://docs.aws.amazon.com/elasticloadbalancing/latest/application/introduction.html)
 
 
 

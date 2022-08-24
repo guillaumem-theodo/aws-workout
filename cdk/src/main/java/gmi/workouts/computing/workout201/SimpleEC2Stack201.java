@@ -30,7 +30,7 @@ public class SimpleEC2Stack201 extends Stack {
         CfnSubnet subnet2 = basicSubnetsStack102.getSubnet2();
 
         CfnInternetGateway internetGateway = createAndAttachInternetGateway(this, vpcStack101.getVpc(), "cpu-201-igw");
-        InternetGatewayHelper.createAndAttachRouteTableToSubnet(this, vpcStack101.getVpc(), subnet2, internetGateway, "cpu-201-rt-1");
+        InternetGatewayHelper.createAndAttachRouteTableToSubnets(this, "cpu-201-rt-1", vpcStack101.getVpc(), internetGateway, subnet2);
 
         CfnSecurityGroup securityGroup = createSecurityGroup(vpcStack101);
 

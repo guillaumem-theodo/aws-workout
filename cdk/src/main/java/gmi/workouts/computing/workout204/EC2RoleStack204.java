@@ -77,7 +77,7 @@ public class EC2RoleStack204 extends Stack {
         CfnSubnet subnet2 = basicSubnetsStack102.getSubnet2();
 
         CfnInternetGateway internetGateway = createAndAttachInternetGateway(this, vpcStack101.getVpc(), "cpu-204-igw");
-        InternetGatewayHelper.createAndAttachRouteTableToSubnet(this, vpcStack101.getVpc(), subnet2, internetGateway, "cpu-204-rt-1");
+        InternetGatewayHelper.createAndAttachRouteTableToSubnets(this, "cpu-204-rt-1", vpcStack101.getVpc(), internetGateway, subnet2);
 
         return createSecurityGroup(vpcStack101);
     }

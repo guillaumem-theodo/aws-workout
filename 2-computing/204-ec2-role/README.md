@@ -40,6 +40,12 @@ aws S3 ls s3://your-bucket-name
 </div>
 <br>
 
+You can use following commands to check your mission success
+```shell
+./launch.sh 2-computing/204-ec2-role/TEST-ssh-public-ec2.sh
+./launch.sh 2-computing/204-ec2-role/TEST-s3-access.sh
+```
+
 ## Materials
 [Doc AWS](https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/iam-roles-for-amazon-ec2.html)
 

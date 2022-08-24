@@ -149,11 +149,11 @@ public class BastionStack105 extends Stack {
     }
 
     private void createBastionEC2(CfnSubnet subnet, CfnSecurityGroup securityGroup, CfnInstanceProfile instanceProfile) {
-        createEC2(this, subnet, securityGroup, "net-105-ec2-1", true, instanceProfile);
+        createEC2(this, "net-105-ec2-1", subnet, securityGroup, true, instanceProfile, null);
     }
 
     private void createPrivateEC2(CfnSubnet subnet, CfnSecurityGroup securityGroup, CfnInstanceProfile instanceProfile) {
-        createEC2(this, subnet, securityGroup, "net-105-ec2-2", false, instanceProfile);
+        createEC2(this, "net-105-ec2-2", subnet, securityGroup, false, instanceProfile, null);
     }
 
     public CfnRouteTable getPrivateRouteTable() {

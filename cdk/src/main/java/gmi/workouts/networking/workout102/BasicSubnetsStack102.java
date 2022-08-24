@@ -25,6 +25,8 @@ public class BasicSubnetsStack102 extends Stack {
 
     private final CfnSubnet subnet2;
     private final CfnSubnet subnet1;
+    private final CfnSubnet subnet3;
+    private final CfnSubnet subnet4;
 
     public BasicSubnetsStack102(final Construct scope, final String id, final StackProps props, VpcStack101 vpcStack101) {
         super(scope, id, props);
@@ -52,14 +54,14 @@ public class BasicSubnetsStack102 extends Stack {
                 .tags(createCommonTags("net-102-subnet-2")).build();
 
         // ## This third SUBNET lies in the first AZ of the Region and has (4096) IPs from 10.1.224.0 to 10.1.239.255
-        CfnSubnet.Builder.create(this, "net-102-subnet-3")
+        subnet3 = CfnSubnet.Builder.create(this, "net-102-subnet-3")
                 .cidrBlock("10.1.224.0/20")
                 .vpcId(vpc.getAttrVpcId())
                 .availabilityZone(oneAZ)
                 .tags(createCommonTags("net-102-subnet-3")).build();
 
         // ## This fourth SUBNET lies in the second AZ of the Region and has (4096) IPs from 10.1.240.0 to 10.1.255.255
-        CfnSubnet.Builder.create(this, "net-102-subnet-4")
+        subnet4 = CfnSubnet.Builder.create(this, "net-102-subnet-4")
                 .cidrBlock("10.1.240.0/20")
                 .vpcId(vpc.getAttrVpcId())
                 .availabilityZone(anotherAZ)
@@ -75,4 +77,11 @@ public class BasicSubnetsStack102 extends Stack {
         return subnet2;
     }
 
+    public CfnSubnet getSubnet3() {
+        return subnet3;
+    }
+
+    public CfnSubnet getSubnet4() {
+        return subnet4;
+    }
 }

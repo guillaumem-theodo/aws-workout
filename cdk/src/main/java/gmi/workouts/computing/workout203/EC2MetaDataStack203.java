@@ -44,7 +44,7 @@ public class EC2MetaDataStack203 extends Stack {
         CfnSubnet subnet2 = basicSubnetsStack102.getSubnet2();
 
         CfnInternetGateway internetGateway = createAndAttachInternetGateway(this, vpcStack101.getVpc(), "cpu-203-igw");
-        InternetGatewayHelper.createAndAttachRouteTableToSubnet(this, vpcStack101.getVpc(), subnet2, internetGateway, "cpu-203-rt-1");
+        InternetGatewayHelper.createAndAttachRouteTableToSubnets(this, "cpu-203-rt-1", vpcStack101.getVpc(), internetGateway, subnet2);
 
         CfnSecurityGroup securityGroup = createSecurityGroup(vpcStack101);
 

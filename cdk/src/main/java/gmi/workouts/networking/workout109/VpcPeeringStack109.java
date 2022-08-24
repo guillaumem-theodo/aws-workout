@@ -11,7 +11,7 @@ import java.util.List;
 import static gmi.workouts.common.CommonIAM.createCommonEC2InstanceProfile;
 import static gmi.workouts.utils.EC2Helper.createEC2;
 import static gmi.workouts.utils.InternetGatewayHelper.createAndAttachInternetGateway;
-import static gmi.workouts.utils.InternetGatewayHelper.createAndAttachRouteTableToSubnet;
+import static gmi.workouts.utils.InternetGatewayHelper.createAndAttachRouteTableToSubnets;
 import static gmi.workouts.utils.SecurityGroupHelper.DefaultPort.SSH;
 import static gmi.workouts.utils.SecurityGroupHelper.createSecurityGroup;
 import static gmi.workouts.utils.TagsHelper.createCommonTags;
@@ -65,9 +65,9 @@ public class VpcPeeringStack109 extends Stack {
 
         CfnInternetGateway internetGateway = createAndAttachInternetGateway(this, vpc3, "net-109-igw");
 
-        CfnRouteTable routeTable3 = createAndAttachRouteTableToSubnet(this, vpc3, subnet3, internetGateway, "net-109-rt-3");
-        CfnRouteTable routeTable2 = createAndAttachRouteTableToSubnet(this, vpc2, subnet2, null, "net-109-rt-2");
-        CfnRouteTable routeTable1 = createAndAttachRouteTableToSubnet(this, vpc1, subnet1, null, "net-109-rt-1");
+        CfnRouteTable routeTable3 = createAndAttachRouteTableToSubnets(this, "net-109-rt-3", vpc3, internetGateway, subnet3);
+        CfnRouteTable routeTable2 = createAndAttachRouteTableToSubnets(this, "net-109-rt-2", vpc2, null, subnet2);
+        CfnRouteTable routeTable1 = createAndAttachRouteTableToSubnets(this, "net-109-rt-1", vpc1, null, subnet1);
 
         CfnSecurityGroup securityGroup1 = createSecurityGroup(this, vpc1, "net-109-sg-1");
         CfnSecurityGroup securityGroup2 = createSecurityGroup(this, vpc2, "net-109-sg-2");
@@ -91,10 +91,10 @@ public class VpcPeeringStack109 extends Stack {
                 .cidrIp(vpc2.getCidrBlock())
                 .build();
 
-        CfnInstanceProfile commonEC2InstanceProfile = createCommonEC2InstanceProfile(this);
-        createEC2(this, subnet1, securityGroup1, "net-109-ec2-1", true, commonEC2InstanceProfile);
-        createEC2(this, subnet2, securityGroup2, "net-109-ec2-2", true, commonEC2InstanceProfile);
-        createEC2(this, subnet3, securityGroup3, "net-109-ec2-3", true, commonEC2InstanceProfile);
+        CfnInstanceProfile instanceProfile = createCommonEC2InstanceProfile(this);
+        createEC2(this, "net-109-ec2-1", subnet1, securityGroup1, true, instanceProfile, null);
+        createEC2(this, "net-109-ec2-2", subnet2, securityGroup2, true, instanceProfile, null);
+        createEC2(this, "net-109-ec2-3", subnet3, securityGroup3, true, instanceProfile, null);
 
         createVpcPeering(vpc3, vpc2, routeTable3, routeTable2, securityGroup3, securityGroup2, "net-109-peering-3-2");
 

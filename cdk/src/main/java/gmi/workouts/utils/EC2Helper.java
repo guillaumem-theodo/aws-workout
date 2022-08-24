@@ -4,6 +4,8 @@ import software.amazon.awscdk.services.ec2.*;
 import software.amazon.awscdk.services.iam.CfnInstanceProfile;
 import software.constructs.Construct;
 
+import java.nio.charset.StandardCharsets;
+import java.util.Base64;
 import java.util.Collections;
 
 import static gmi.workouts.utils.TagsHelper.createCommonTags;
@@ -13,14 +15,15 @@ public class EC2Helper {
     public static final String AWS_WORKOUT_KEY = "aws-workout-key";
     public static final String INSTANCE_TYPE = "t2.micro";
 
-    public static void createEC2(final Construct scope,
-                                 CfnSubnet subnet,
-                                 CfnSecurityGroup securityGroup,
-                                 String name,
-                                 boolean withPublicIP, CfnInstanceProfile instanceProfile) {
+    public static CfnInstance createEC2(Construct scope,
+                                        String name,
+                                        CfnSubnet subnet, CfnSecurityGroup securityGroup,
+                                        boolean withPublicIP,
+                                        CfnInstanceProfile instanceProfile,
+                                        String userDataScript) {
         IMachineImage latestAMI = MachineImage.fromSsmParameter(LINUX_LATEST_AMZN_2_AMI_HVM_X_86_64_GP_2, null);
 
-        CfnInstance.Builder.create(scope, name)
+        CfnInstance.Builder builder = CfnInstance.Builder.create(scope, name)
                 .imageId(latestAMI.getImage(scope).getImageId())
                 .keyName(AWS_WORKOUT_KEY)
                 .instanceType(INSTANCE_TYPE)
@@ -33,9 +36,15 @@ public class EC2Helper {
                                         .deviceIndex("0").build()
 
                         ))
-                .iamInstanceProfile(instanceProfile.getInstanceProfileName())
-                .tags(createCommonTags(name))
-                .build();
+                .tags(createCommonTags(name));
+
+        if(instanceProfile != null){
+            builder.iamInstanceProfile(instanceProfile.getInstanceProfileName());
+        }
+        if(userDataScript != null){
+            builder.userData(Base64.getEncoder().encodeToString(userDataScript.getBytes(StandardCharsets.UTF_8)));
+        }
+        return builder.build();
     }
 
 }

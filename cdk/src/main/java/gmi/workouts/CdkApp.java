@@ -5,6 +5,9 @@ import gmi.workouts.computing.workout201.SimpleEC2Stack201;
 import gmi.workouts.computing.workout202.EC2UserDataStack202;
 import gmi.workouts.computing.workout203.EC2MetaDataStack203;
 import gmi.workouts.computing.workout204.EC2RoleStack204;
+import gmi.workouts.computing.workout205.ALBNetworkStack205;
+import gmi.workouts.computing.workout205.ALBParentStack205;
+import gmi.workouts.computing.workout205.ALBStack205;
 import gmi.workouts.networking.workout101.VpcStack101;
 import gmi.workouts.networking.workout102.BasicSubnetsStack102;
 import gmi.workouts.networking.workout103.DefaultRouteAndSecurityGroupStack103;
@@ -66,6 +69,9 @@ public class CdkApp {
         EC2RoleStack204 ec2RoleStack204 = new EC2RoleStack204(app, "workout-204-ec2-role",
                 createStackProps(firstEnvironment), vpcStack101, networkingBasicSubnets102,
                 s3ForTestsInFirstRegionStack, s3ForTestsInSecondRegionStack);
+
+        ALBParentStack205 albStack205 = new ALBParentStack205(app, "workout-205-alb",
+                createStackProps(firstEnvironment), vpcStack101, networkingBasicSubnets102);
     }
 
     private static void addNetworkingTutorialsStacks(App app, Environment firstEnvironment, Environment secondEnvironment) {

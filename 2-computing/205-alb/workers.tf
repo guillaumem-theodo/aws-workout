@@ -13,6 +13,8 @@ resource "aws_instance" "cpu-205-ec2-worker-1" {
     Purpose: var.dojo
     Name: "cpu-205-ec2-1"
   }
+
+  depends_on = [aws_nat_gateway.cpu-205-nat-gtw] // Needed for upload httpd
 }
 
 resource "aws_instance" "cpu-205-ec2-worker-2" {
@@ -28,6 +30,8 @@ resource "aws_instance" "cpu-205-ec2-worker-2" {
     Purpose: var.dojo
     Name: "cpu-205-ec2-2"
   }
+
+  depends_on = [aws_nat_gateway.cpu-205-nat-gtw] // Needed for upload httpd
 }
 
 resource "aws_instance" "cpu-205-ec2-worker-3" {
@@ -43,4 +47,6 @@ resource "aws_instance" "cpu-205-ec2-worker-3" {
     Purpose: var.dojo
     Name: "cpu-205-ec2-3"
   }
+
+  depends_on = [aws_nat_gateway.cpu-205-nat-gtw] // Needed for upload httpd
 }

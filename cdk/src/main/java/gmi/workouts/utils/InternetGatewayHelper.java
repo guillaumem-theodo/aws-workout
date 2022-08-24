@@ -19,7 +19,8 @@ public class InternetGatewayHelper {
         return internetGateway;
     }
 
-    public static CfnRouteTable createAndAttachRouteTableToSubnet(Construct scope, CfnVPC vpc, CfnSubnet subnet, CfnInternetGateway igw, String name) {
+    public static CfnRouteTable createAndAttachRouteTableToSubnets(Construct scope, String name, CfnVPC vpc,
+                                                                   CfnInternetGateway igw, CfnSubnet... subnets) {
         CfnRouteTable routeTable = CfnRouteTable.Builder.create(scope, name)
                 .tags(createCommonTags(name))
                 .vpcId(vpc.getAttrVpcId())
@@ -33,10 +34,13 @@ public class InternetGatewayHelper {
                     .build();
         }
 
-        CfnSubnetRouteTableAssociation.Builder.create(scope, name + "-subnet-association")
-                .routeTableId(routeTable.getAttrRouteTableId())
-                .subnetId(subnet.getAttrSubnetId())
-                .build();
+        int count = 0;
+        for (CfnSubnet subnet : subnets) {
+            CfnSubnetRouteTableAssociation.Builder.create(scope, name + "-subnet-association-" + count++)
+                    .routeTableId(routeTable.getAttrRouteTableId())
+                    .subnetId(subnet.getAttrSubnetId())
+                    .build();
+        }
 
         return routeTable;
     }
