@@ -5,9 +5,7 @@ import gmi.workouts.computing.workout201.SimpleEC2Stack201;
 import gmi.workouts.computing.workout202.EC2UserDataStack202;
 import gmi.workouts.computing.workout203.EC2MetaDataStack203;
 import gmi.workouts.computing.workout204.EC2RoleStack204;
-import gmi.workouts.computing.workout205.ALBNetworkStack205;
 import gmi.workouts.computing.workout205.ALBParentStack205;
-import gmi.workouts.computing.workout205.ALBStack205;
 import gmi.workouts.networking.workout101.VpcStack101;
 import gmi.workouts.networking.workout102.BasicSubnetsStack102;
 import gmi.workouts.networking.workout103.DefaultRouteAndSecurityGroupStack103;
@@ -24,8 +22,6 @@ import software.amazon.awscdk.Environment;
 import software.amazon.awscdk.StackProps;
 
 import java.util.Collections;
-
-import static gmi.workouts.utils.TagsHelper.createCommonTags;
 
 public class CdkApp {
     public static final String PURPOSE = "aws-workout";

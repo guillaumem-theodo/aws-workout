@@ -12,7 +12,7 @@ import software.constructs.Construct;
 
 import static gmi.workouts.utils.InternetGatewayHelper.createAndAttachInternetGateway;
 import static gmi.workouts.utils.InternetGatewayHelper.createAndAttachRouteTableToSubnets;
-import static gmi.workouts.utils.IpChecker.getMyIPAddressCIDR;
+import static gmi.workouts.utils.MyIpHelper.getMyIPAddressCIDR;
 import static gmi.workouts.utils.NatGatewayHelper.createAndAttachNatGateway;
 import static gmi.workouts.utils.SecurityGroupHelper.DefaultPort.HTTP;
 

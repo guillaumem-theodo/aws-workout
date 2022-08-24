@@ -1,12 +1,10 @@
 package gmi.workouts.utils;
 
-import org.jetbrains.annotations.NotNull;
 import software.amazon.awscdk.services.ec2.CfnSecurityGroup;
 import software.amazon.awscdk.services.ec2.CfnVPC;
 import software.constructs.Construct;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
@@ -24,7 +22,7 @@ public class SecurityGroupHelper {
         return CfnSecurityGroup.Builder.create(scope, name)
                 .vpcId(vpc.getAttrVpcId())
                 .groupName(name)
-                .groupDescription("Security Group with ingress for PING and SSH, and egress for all")
+                .groupDescription("Security Group:" + name)
                 .securityGroupEgress(Collections.singletonList(CfnSecurityGroup.EgressProperty.builder()
                         .cidrIp("0.0.0.0/0")
                         .ipProtocol("-1").fromPort(0).toPort(0)
@@ -35,7 +33,6 @@ public class SecurityGroupHelper {
                 .build();
     }
 
-    @NotNull
     private static List<CfnSecurityGroup.IngressProperty> getSecurityGroupIngress(DefaultPort... defaultPorts) {
         ArrayList<CfnSecurityGroup.IngressProperty> ingressProperties = new ArrayList<>();
         for (DefaultPort defaultPort : defaultPorts) {

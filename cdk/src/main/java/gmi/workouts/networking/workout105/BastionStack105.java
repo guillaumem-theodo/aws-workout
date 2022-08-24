@@ -2,7 +2,7 @@ package gmi.workouts.networking.workout105;
 
 import gmi.workouts.networking.workout101.VpcStack101;
 import gmi.workouts.networking.workout102.BasicSubnetsStack102;
-import gmi.workouts.utils.IpChecker;
+import gmi.workouts.utils.MyIpHelper;
 import org.jetbrains.annotations.NotNull;
 import software.amazon.awscdk.Stack;
 import software.amazon.awscdk.StackProps;
@@ -104,7 +104,7 @@ public class BastionStack105 extends Stack {
 
     @NotNull
     private CfnSecurityGroup createSecurityGroup(CfnVPC vpc) {
-        String myIPAddressCIDR = IpChecker.getMyIPAddressCIDR();
+        String myIPAddressCIDR = MyIpHelper.getMyIPAddressCIDR();
 
         return CfnSecurityGroup.Builder.create(this, "net-105-sg-1")
                 .vpcId(vpc.getAttrVpcId())

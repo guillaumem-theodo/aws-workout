@@ -13,8 +13,8 @@ import software.constructs.Construct;
 
 import java.util.Collections;
 
-import static gmi.workouts.utils.InternetGatewayHelper.*;
-import static gmi.workouts.utils.IpChecker.getMyIPAddressCIDR;
+import static gmi.workouts.utils.InternetGatewayHelper.createAndAttachInternetGateway;
+import static gmi.workouts.utils.MyIpHelper.getMyIPAddressCIDR;
 import static gmi.workouts.utils.SecurityGroupHelper.DefaultPort.HTTP;
 import static gmi.workouts.utils.TagsHelper.createCommonTags;
 

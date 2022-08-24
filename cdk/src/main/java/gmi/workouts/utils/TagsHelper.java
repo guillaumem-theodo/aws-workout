@@ -9,8 +9,6 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-import static gmi.workouts.CdkApp.PURPOSE;
-
 public class TagsHelper {
     @NotNull
     public static List<CfnTag> createCommonTags(String name, CfnTag... tags) {

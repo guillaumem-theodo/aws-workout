@@ -12,7 +12,7 @@ import java.util.Collections;
 
 public class S3ForTestsStack extends Stack {
 
-    public S3ForTestsStack(final Construct scope, final String id, final StackProps props, String suffixName) {
+    public S3ForTestsStack(final Construct scope, String id, StackProps props, String suffixName) {
         super(scope, id, props);
 
         createBucketInFirstRegionForTests(this, suffixName);
@@ -29,7 +29,7 @@ public class S3ForTestsStack extends Stack {
 
         BucketDeployment.Builder.create(scope, "common-"+suffixName+"-deployment")
                 .destinationBucket(bucket)
-                .sources(Collections.singletonList(Source.asset("./fixtures")))
+                .sources(Collections.singletonList(Source.asset("./fixtures"))) // Fixtures are found at CDK root level
                 .build();
     }
 }
