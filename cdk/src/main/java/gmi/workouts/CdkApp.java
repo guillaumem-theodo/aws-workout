@@ -15,9 +15,14 @@ import gmi.workouts.networking.workout107.VpcEndpointStack107;
 import gmi.workouts.networking.workout107nat.VpcEndpointWithNatStack107;
 import gmi.workouts.networking.workout108.DnsStack108;
 import gmi.workouts.networking.workout109.VpcPeeringStack109;
+import org.jetbrains.annotations.NotNull;
 import software.amazon.awscdk.App;
 import software.amazon.awscdk.Environment;
 import software.amazon.awscdk.StackProps;
+
+import java.util.Collections;
+
+import static gmi.workouts.utils.TagsHelper.createCommonTags;
 
 public class CdkApp {
     public static final String PURPOSE = "aws-workout";
@@ -50,99 +55,75 @@ public class CdkApp {
 
     private static void addComputingTutorialsStacks(App app, Environment firstEnvironment, Environment secondEnvironment) {
         SimpleEC2Stack201 simpleEC2Stack201 = new SimpleEC2Stack201(app, "workout-201-basic-ec2",
-                StackProps.builder()
-                        .env(firstEnvironment)
-                        .build(), vpcStack101, networkingBasicSubnets102);
+                createStackProps(firstEnvironment), vpcStack101, networkingBasicSubnets102);
 
         EC2UserDataStack202 ec2UserDataStack202 = new EC2UserDataStack202(app, "workout-202-user-data",
-                StackProps.builder()
-                        .env(firstEnvironment)
-                        .build(), vpcStack101, networkingBasicSubnets102);
+                createStackProps(firstEnvironment), vpcStack101, networkingBasicSubnets102);
 
         EC2MetaDataStack203 ec2MetaDataStack203 = new EC2MetaDataStack203(app, "workout-203-meta-data",
-                StackProps.builder()
-                        .env(firstEnvironment)
-                        .build(), vpcStack101, networkingBasicSubnets102);
+                createStackProps(firstEnvironment), vpcStack101, networkingBasicSubnets102);
 
         EC2RoleStack204 ec2RoleStack204 = new EC2RoleStack204(app, "workout-204-ec2-role",
-                StackProps.builder()
-                        .env(firstEnvironment)
-                        .build(), vpcStack101, networkingBasicSubnets102,
+                createStackProps(firstEnvironment), vpcStack101, networkingBasicSubnets102,
                 s3ForTestsInFirstRegionStack, s3ForTestsInSecondRegionStack);
     }
 
     private static void addNetworkingTutorialsStacks(App app, Environment firstEnvironment, Environment secondEnvironment) {
         vpcStack101 = new VpcStack101(app, "workout-101-basic-vpc",
-                StackProps.builder()
-                        .env(firstEnvironment)
-                        .build());
+                createStackProps(firstEnvironment));
 
         networkingBasicSubnets102 = new BasicSubnetsStack102(app, "workout-102-basic-subnets",
-                StackProps.builder()
-                        .env(firstEnvironment)
-                        .build(), vpcStack101);
+                createStackProps(firstEnvironment), vpcStack101);
 
         DefaultRouteAndSecurityGroupStack103 networkingDefaultRouteAndSg103 =
                 new DefaultRouteAndSecurityGroupStack103(app, "workout-103-vpc-default-route-default-sg",
-                StackProps.builder()
-                        .env(firstEnvironment)
-                        .build(), vpcStack101, networkingBasicSubnets102);
+                        createStackProps(firstEnvironment), vpcStack101, networkingBasicSubnets102);
 
         InternetAccessStack104 internetAccessStack104 =
                 new InternetAccessStack104(app, "workout-104-internet-access",
-                StackProps.builder()
-                        .env(firstEnvironment)
-                        .build(), vpcStack101, networkingBasicSubnets102);
+                        createStackProps(firstEnvironment), vpcStack101, networkingBasicSubnets102);
 
         BastionStack105 bastionStack105 =
                 new BastionStack105(app, "workout-105-bastion",
-                StackProps.builder()
-                        .env(firstEnvironment)
-                        .build(), vpcStack101, networkingBasicSubnets102);
+                        createStackProps(firstEnvironment), vpcStack101, networkingBasicSubnets102);
 
         NatGatewayStack106 natGatewayStack106 =
                 new NatGatewayStack106(app, "workout-106-nat-gtw",
-                StackProps.builder()
-                        .env(firstEnvironment)
-                        .build(), vpcStack101, networkingBasicSubnets102, bastionStack105);
+                        createStackProps(firstEnvironment), vpcStack101, networkingBasicSubnets102, bastionStack105);
 
         s3ForTestsInFirstRegionStack = new S3ForTestsStack(app, "common-s3-region-1",
-                StackProps.builder()
-                                .env(firstEnvironment)
-                                .build(), "s3-bucket-1");
+                createStackProps(firstEnvironment), "s3-bucket-1");
         s3ForTestsInSecondRegionStack = new S3ForTestsStack(app, "common-s3-region-2",
-                StackProps.builder()
-                                .env(secondEnvironment)
-                                .build(), "s3-bucket-2");
+                createStackProps(secondEnvironment), "s3-bucket-2");
 
         VpcEndpointStack107 vpcEndpointStack107 =
                 new VpcEndpointStack107(app, "workout-107-vpc-endpoint",
-                StackProps.builder()
-                        .env(firstEnvironment)
-                        .build(),
+                        createStackProps(firstEnvironment),
                         vpcStack101, networkingBasicSubnets102, bastionStack105,
                         s3ForTestsInFirstRegionStack,
                         s3ForTestsInSecondRegionStack);
 
         VpcEndpointWithNatStack107 vpcEndpointWithNatStack107 =
                 new VpcEndpointWithNatStack107(app, "workout-107-vpc-endpoint-with-nat",
-                StackProps.builder()
-                        .env(firstEnvironment)
-                        .build(),
+                        createStackProps(firstEnvironment),
                         vpcStack101, networkingBasicSubnets102, bastionStack105, natGatewayStack106,
                         s3ForTestsInFirstRegionStack,
                         s3ForTestsInSecondRegionStack);
 
         DnsStack108 dnsStack108 =
                 new DnsStack108(app, "workout-108-dns",
-                StackProps.builder()
-                        .env(firstEnvironment)
-                        .build());
+                        createStackProps(firstEnvironment));
 
         VpcPeeringStack109 vpcPeeringStack109 =
                 new VpcPeeringStack109(app, "workout-109-vpc-peering",
-                StackProps.builder()
-                        .env(firstEnvironment)
-                        .build());   }
+                        createStackProps(firstEnvironment));   }
+
+    @NotNull
+    private static StackProps createStackProps(Environment environment) {
+        return StackProps.builder()
+                .env(environment)
+                .tags(Collections.singletonMap("Purpose", PURPOSE))
+                .build();
+    }
 }
 
