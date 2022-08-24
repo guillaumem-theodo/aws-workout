@@ -6,8 +6,8 @@ import software.constructs.Construct;
 import static gmi.workouts.utils.TagsHelper.createCommonTags;
 
 public class NatGatewayHelper {
-    public static CfnNatGateway createAndAttachNatGateway(Construct scope, String name, CfnSubnet natSubnet,
-                                                          CfnVPC vpc, CfnSubnet... privateSubnets) {
+    public static CfnNatGateway createAndAttachNatGateway(Construct scope, String name, CfnVPC vpc, CfnSubnet natSubnet,
+                                                          CfnSubnet... privateSubnets) {
         CfnEIP cfnEIP = CfnEIP.Builder.create(scope, name + "-eip")
                 .tags(createCommonTags(name + "-eip"))
                 .build();

@@ -12,6 +12,7 @@ import software.constructs.Construct;
 import java.util.List;
 
 import static gmi.workouts.common.CommonIAM.createCommonEC2InstanceProfile;
+import static gmi.workouts.utils.EC2Helper.Ip.WITH_PUBLIC_IP;
 import static gmi.workouts.utils.EC2Helper.createEC2;
 import static gmi.workouts.utils.InternetGatewayHelper.createAndAttachInternetGateway;
 import static gmi.workouts.utils.InternetGatewayHelper.createAndAttachRouteTableToSubnets;
@@ -68,6 +69,7 @@ public class DnsStack108 extends Stack {
 
 
     private void createEC2InVPC(CfnSubnet subnet, CfnSecurityGroup securityGroup, String name, CfnInstanceProfile instanceProfile) {
-        createEC2(this, name, subnet, securityGroup, true, instanceProfile, null);
+        createEC2(this, name, subnet, securityGroup, WITH_PUBLIC_IP,
+                        builder -> builder.iamInstanceProfile(instanceProfile.getInstanceProfileName()));
     }
 }

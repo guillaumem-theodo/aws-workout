@@ -14,6 +14,8 @@ import java.util.Arrays;
 import java.util.Collections;
 
 import static gmi.workouts.common.CommonIAM.createCommonEC2InstanceProfile;
+import static gmi.workouts.utils.EC2Helper.Ip.WITHOUT_PUBLIC_IP;
+import static gmi.workouts.utils.EC2Helper.Ip.WITH_PUBLIC_IP;
 import static gmi.workouts.utils.EC2Helper.createEC2;
 import static gmi.workouts.utils.TagsHelper.createCommonTags;
 
@@ -149,11 +151,13 @@ public class BastionStack105 extends Stack {
     }
 
     private void createBastionEC2(CfnSubnet subnet, CfnSecurityGroup securityGroup, CfnInstanceProfile instanceProfile) {
-        createEC2(this, "net-105-ec2-1", subnet, securityGroup, true, instanceProfile, null);
+        createEC2(this, "net-105-ec2-1", subnet, securityGroup, WITH_PUBLIC_IP,
+                builder -> builder.iamInstanceProfile(instanceProfile.getInstanceProfileName()));
     }
 
     private void createPrivateEC2(CfnSubnet subnet, CfnSecurityGroup securityGroup, CfnInstanceProfile instanceProfile) {
-        createEC2(this, "net-105-ec2-2", subnet, securityGroup, false, instanceProfile, null);
+        createEC2(this, "net-105-ec2-2", subnet, securityGroup, WITHOUT_PUBLIC_IP,
+                        builder -> builder.iamInstanceProfile(instanceProfile.getInstanceProfileName()));
     }
 
     public CfnRouteTable getPrivateRouteTable() {

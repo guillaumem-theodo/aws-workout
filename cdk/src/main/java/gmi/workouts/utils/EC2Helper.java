@@ -1,13 +1,13 @@
 package gmi.workouts.utils;
 
 import software.amazon.awscdk.services.ec2.*;
-import software.amazon.awscdk.services.iam.CfnInstanceProfile;
 import software.constructs.Construct;
 
 import java.nio.charset.StandardCharsets;
 import java.util.Base64;
 import java.util.Collections;
 
+import static gmi.workouts.utils.EC2Helper.Ip.WITH_PUBLIC_IP;
 import static gmi.workouts.utils.TagsHelper.createCommonTags;
 
 public class EC2Helper {
@@ -15,12 +15,27 @@ public class EC2Helper {
     public static final String AWS_WORKOUT_KEY = "aws-workout-key";
     public static final String INSTANCE_TYPE = "t2.micro";
 
+    public enum Ip {
+        WITH_PUBLIC_IP,
+        WITHOUT_PUBLIC_IP
+    }
+
+    public interface EC2Modifier {
+        void modify(CfnInstance.Builder builder);
+    }
+
+    public static CfnInstance createEC2(Construct scope,
+                                            String name,
+                                            CfnSubnet subnet, CfnSecurityGroup securityGroup,
+                                            Ip withPublicIP) {
+        return createEC2(scope, name, subnet, securityGroup, withPublicIP, builder -> {});
+    }
+
     public static CfnInstance createEC2(Construct scope,
                                         String name,
                                         CfnSubnet subnet, CfnSecurityGroup securityGroup,
-                                        boolean withPublicIP,
-                                        CfnInstanceProfile instanceProfile,
-                                        String userDataScript) {
+                                        Ip withPublicIP,
+                                        EC2Modifier modifier) {
         IMachineImage latestAMI = MachineImage.fromSsmParameter(LINUX_LATEST_AMZN_2_AMI_HVM_X_86_64_GP_2, null);
 
         CfnInstance.Builder builder = CfnInstance.Builder.create(scope, name)
@@ -31,20 +46,19 @@ public class EC2Helper {
                         Collections.singletonList(
                                 CfnInstance.NetworkInterfaceProperty.builder()
                                         .subnetId(subnet.getAttrSubnetId())
-                                        .associatePublicIpAddress(withPublicIP)
+                                        .associatePublicIpAddress(WITH_PUBLIC_IP.equals(withPublicIP))
                                         .groupSet(Collections.singletonList(securityGroup.getAttrGroupId()))
                                         .deviceIndex("0").build()
 
                         ))
                 .tags(createCommonTags(name));
 
-        if(instanceProfile != null){
-            builder.iamInstanceProfile(instanceProfile.getInstanceProfileName());
-        }
-        if(userDataScript != null){
-            builder.userData(Base64.getEncoder().encodeToString(userDataScript.getBytes(StandardCharsets.UTF_8)));
-        }
+        modifier.modify(builder);
+
         return builder.build();
     }
 
+    public static String encodeUserData(String userDataScript) {
+        return Base64.getEncoder().encodeToString(userDataScript.getBytes(StandardCharsets.UTF_8));
+    }
 }

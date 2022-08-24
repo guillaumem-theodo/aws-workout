@@ -9,6 +9,7 @@ import software.constructs.Construct;
 import java.util.List;
 
 import static gmi.workouts.common.CommonIAM.createCommonEC2InstanceProfile;
+import static gmi.workouts.utils.EC2Helper.Ip.WITH_PUBLIC_IP;
 import static gmi.workouts.utils.EC2Helper.createEC2;
 import static gmi.workouts.utils.InternetGatewayHelper.createAndAttachInternetGateway;
 import static gmi.workouts.utils.InternetGatewayHelper.createAndAttachRouteTableToSubnets;
@@ -92,9 +93,12 @@ public class VpcPeeringStack109 extends Stack {
                 .build();
 
         CfnInstanceProfile instanceProfile = createCommonEC2InstanceProfile(this);
-        createEC2(this, "net-109-ec2-1", subnet1, securityGroup1, true, instanceProfile, null);
-        createEC2(this, "net-109-ec2-2", subnet2, securityGroup2, true, instanceProfile, null);
-        createEC2(this, "net-109-ec2-3", subnet3, securityGroup3, true, instanceProfile, null);
+        createEC2(this, "net-109-ec2-1", subnet1, securityGroup1, WITH_PUBLIC_IP,
+                        builder -> builder.iamInstanceProfile(instanceProfile.getInstanceProfileName()));
+        createEC2(this, "net-109-ec2-2", subnet2, securityGroup2, WITH_PUBLIC_IP,
+                        builder -> builder.iamInstanceProfile(instanceProfile.getInstanceProfileName()));
+        createEC2(this, "net-109-ec2-3", subnet3, securityGroup3, WITH_PUBLIC_IP,
+                        builder -> builder.iamInstanceProfile(instanceProfile.getInstanceProfileName()));
 
         createVpcPeering(vpc3, vpc2, routeTable3, routeTable2, securityGroup3, securityGroup2, "net-109-peering-3-2");
 

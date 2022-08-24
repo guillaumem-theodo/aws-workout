@@ -4,6 +4,7 @@ import gmi.workouts.networking.workout101.VpcStack101;
 import gmi.workouts.networking.workout102.BasicSubnetsStack102;
 import software.amazon.awscdk.NestedStack;
 import software.amazon.awscdk.services.ec2.CfnInstance;
+import software.amazon.awscdk.services.ec2.CfnSecurityGroup;
 import software.amazon.awscdk.services.elasticloadbalancingv2.CfnListener;
 import software.amazon.awscdk.services.elasticloadbalancingv2.CfnLoadBalancer;
 import software.amazon.awscdk.services.elasticloadbalancingv2.CfnTargetGroup;
@@ -12,7 +13,10 @@ import software.constructs.Construct;
 import java.util.Arrays;
 import java.util.Collections;
 
+import static gmi.workouts.utils.EC2Helper.Ip.WITHOUT_PUBLIC_IP;
+import static gmi.workouts.utils.EC2Helper.Ip.WITH_PUBLIC_IP;
 import static gmi.workouts.utils.EC2Helper.createEC2;
+import static gmi.workouts.utils.EC2Helper.encodeUserData;
 
 public class ALBStack205 extends NestedStack {
     private static final String USER_DATA_SCRIPT =
@@ -45,17 +49,25 @@ public class ALBStack205 extends NestedStack {
 
     private void createBastion(BasicSubnetsStack102 subnets, ALBNetworkStack205 albNetworkStack205) {
         createEC2(this, "cpu-205-ec2-bastion-1", subnets.getSubnet2(),
-                albNetworkStack205.getBastionSecurityGroup(), true, null, null);
+                albNetworkStack205.getBastionSecurityGroup(), WITH_PUBLIC_IP);
     }
 
     private void createWorkers(BasicSubnetsStack102 subnets, ALBNetworkStack205 albNetworkStack205) {
+        CfnSecurityGroup workerSecurityGroup = albNetworkStack205.getWorkerSecurityGroup();
+
         worker1 = createEC2(this, "cpu-205-ec2-worker-1", subnets.getSubnet3(),
-                albNetworkStack205.getWorkerSecurityGroup(), false, null, USER_DATA_SCRIPT);
+                workerSecurityGroup, WITHOUT_PUBLIC_IP,
+                builder -> builder.userData(encodeUserData(USER_DATA_SCRIPT)));
+
         worker2 = createEC2(this, "cpu-205-ec2-worker-2", subnets.getSubnet3(),
-                albNetworkStack205.getWorkerSecurityGroup(), false, null, USER_DATA_SCRIPT);
+                workerSecurityGroup, WITHOUT_PUBLIC_IP,
+                builder -> builder.userData(encodeUserData(USER_DATA_SCRIPT)));
+
         worker3 = createEC2(this, "cpu-205-ec2-worker-3", subnets.getSubnet4(),
-                albNetworkStack205.getWorkerSecurityGroup(), false, null, USER_DATA_SCRIPT);
+                workerSecurityGroup, WITHOUT_PUBLIC_IP,
+                builder -> builder.userData(encodeUserData(USER_DATA_SCRIPT)));
     }
+
     private void createAlb(VpcStack101 vpcStack101, BasicSubnetsStack102 subnets, ALBNetworkStack205 albNetwork) {
 
         CfnLoadBalancer cfnLoadBalancer = CfnLoadBalancer.Builder.create(this, "cpu-205-alb")
@@ -94,7 +106,6 @@ public class ALBStack205 extends NestedStack {
                 .loadBalancerArn(cfnLoadBalancer.getRef())
                 .defaultActions(Collections.singletonList(forwardAction))
                 .build();
-
 
 
     }

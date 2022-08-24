@@ -45,6 +45,12 @@ public class CdkApp {
                 .region(TUTORIAL_ANOTHER_REGION)
                 .build();
 
+        s3ForTestsInFirstRegionStack = new S3ForTestsStack(app, "common-s3-region-1",
+                createStackProps(firstEnvironment), "s3-bucket-1");
+
+        s3ForTestsInSecondRegionStack = new S3ForTestsStack(app, "common-s3-region-2",
+                createStackProps(secondEnvironment), "s3-bucket-2");
+
         addNetworkingTutorialsStacks(app, firstEnvironment, secondEnvironment);
         addComputingTutorialsStacks(app, firstEnvironment, secondEnvironment);
 
@@ -93,10 +99,7 @@ public class CdkApp {
                 new NatGatewayStack106(app, "workout-106-nat-gtw",
                         createStackProps(firstEnvironment), vpcStack101, networkingBasicSubnets102, bastionStack105);
 
-        s3ForTestsInFirstRegionStack = new S3ForTestsStack(app, "common-s3-region-1",
-                createStackProps(firstEnvironment), "s3-bucket-1");
-        s3ForTestsInSecondRegionStack = new S3ForTestsStack(app, "common-s3-region-2",
-                createStackProps(secondEnvironment), "s3-bucket-2");
+
 
         VpcEndpointStack107 vpcEndpointStack107 =
                 new VpcEndpointStack107(app, "workout-107-vpc-endpoint",

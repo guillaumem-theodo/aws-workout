@@ -42,7 +42,7 @@ public class ALBNetworkStack205 extends NestedStack {
 
         CfnInternetGateway internetGateway = createAndAttachInternetGateway(this, vpcStack101.getVpc(), "cpu-205-igw");
         createAndAttachRouteTableToSubnets(this, "cpu-205-rt-1", vpcStack101.getVpc(), internetGateway, subnet1, subnet2);
-        createAndAttachNatGateway(this, "cpu-205-nat", subnet1, vpcStack101.getVpc(), subnet3, subnet4);
+        createAndAttachNatGateway(this, "cpu-205-nat", vpcStack101.getVpc(), subnet1, subnet3, subnet4);
 
         createSecurityGroup(vpcStack101);
     }
