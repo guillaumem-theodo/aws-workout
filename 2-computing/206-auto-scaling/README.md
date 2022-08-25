@@ -1,8 +1,8 @@
 ## ASG - Auto Scaling Group
 
-⭐⭐⭐ (more complexe)️ ⭐⭐⭐
+⭐⭐⭐ (more complex)️ ⭐⭐⭐
 
-Instead of creating a finite number of workers EC2, like in `206-alb` workout, we are going to ask AWS to start or stop EC2 depending on the traffic load.
+Instead of creating a fixed finite number of workers, like in `205-alb` workout, we are going to ask AWS to start or stop workers depending on the traffic load.
 
 The ALB target Group will not be linked anymore to EC2 Targets but to an *Auto Scaling Group* (ASG).
 

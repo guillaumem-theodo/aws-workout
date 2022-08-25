@@ -50,7 +50,7 @@ resource "aws_lb" "cpu-205-alb" {
   name = "cpu-205-alb"
 
   tags = {
-    Purpose: "demo"
+    Purpose: var.dojo
     Name: "cpu-205-alb"
   }
 }
@@ -59,6 +59,10 @@ resource "aws_lb_target_group" "cpu-205-alb-target-group" {
   port     = 80
   protocol = "HTTP"
   vpc_id = var.vpc_id
+  tags = {
+    Purpose: var.dojo
+    Name: "cpu-205-alb-target-group"
+  }
 }
 
 resource "aws_lb_target_group_attachment" "cpu-205-alb-target-1" {
@@ -78,12 +82,16 @@ resource "aws_lb_target_group_attachment" "cpu-205-alb-target-3" {
   port             = 80
 }
 
-resource "aws_lb_listener" "my_alb_listener" {
+resource "aws_lb_listener" "cpu-205-alb-listener" {
   load_balancer_arn = aws_lb.cpu-205-alb.arn
   port = 80
   default_action {
     type             = "forward"
     target_group_arn = aws_lb_target_group.cpu-205-alb-target-group.arn
+  }
+  tags = {
+    Purpose: var.dojo
+    Name: "cpu-205-alb-listener"
   }
 }
 

@@ -1,8 +1,8 @@
 ## ECS - FARGATE : Managed Cluster
 
-⭐⭐⭐ (more complexe)️ ⭐⭐⭐
+⭐⭐⭐ (more complex)️ ⭐⭐⭐
 
-ECS is an AWS Service for Containers Clusters (Kub...)
+ECS is an AWS Service for Containers Clusters
 
 The **ECS** Service let you provision Tasks and Services.
 - **Tasks** are descriptions of the containers to be run
