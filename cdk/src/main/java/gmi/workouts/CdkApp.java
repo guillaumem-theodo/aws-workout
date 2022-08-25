@@ -6,6 +6,7 @@ import gmi.workouts.computing.workout202.EC2UserDataStack202;
 import gmi.workouts.computing.workout203.EC2MetaDataStack203;
 import gmi.workouts.computing.workout204.EC2RoleStack204;
 import gmi.workouts.computing.workout205.ALBParentStack205;
+import gmi.workouts.computing.workout206.ASGParentStack206;
 import gmi.workouts.networking.workout101.VpcStack101;
 import gmi.workouts.networking.workout102.BasicSubnetsStack102;
 import gmi.workouts.networking.workout103.DefaultRouteAndSecurityGroupStack103;
@@ -73,6 +74,9 @@ public class CdkApp {
                 s3ForTestsInFirstRegionStack, s3ForTestsInSecondRegionStack);
 
         ALBParentStack205 albStack205 = new ALBParentStack205(app, "workout-205-alb",
+                createStackProps(firstEnvironment), vpcStack101, networkingBasicSubnets102);
+
+        ASGParentStack206 asgParentStack206 = new ASGParentStack206(app, "workout-206-auto-scaling",
                 createStackProps(firstEnvironment), vpcStack101, networkingBasicSubnets102);
     }
 
