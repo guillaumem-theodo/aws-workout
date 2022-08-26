@@ -21,7 +21,7 @@ resource "aws_ecs_cluster_capacity_providers" "cpu-207-ecs-cluster-capacity-prov
 }
 
 resource "aws_ecs_task_definition" "cpu-207-ecs-task-definition" {
-  family = "pu-207-ecs-task-definition"
+  family = "cpu-207-ecs-task-definition"
   requires_compatibilities = ["FARGATE"]
   network_mode = "awsvpc"
   cpu = 256

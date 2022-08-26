@@ -7,6 +7,7 @@ import gmi.workouts.computing.workout203.EC2MetaDataStack203;
 import gmi.workouts.computing.workout204.EC2RoleStack204;
 import gmi.workouts.computing.workout205.ALBParentStack205;
 import gmi.workouts.computing.workout206.ASGParentStack206;
+import gmi.workouts.computing.workout207.ECSParentStack207;
 import gmi.workouts.networking.workout101.VpcStack101;
 import gmi.workouts.networking.workout102.BasicSubnetsStack102;
 import gmi.workouts.networking.workout103.DefaultRouteAndSecurityGroupStack103;
@@ -77,6 +78,9 @@ public class CdkApp {
                 createStackProps(firstEnvironment), vpcStack101, networkingBasicSubnets102);
 
         ASGParentStack206 asgParentStack206 = new ASGParentStack206(app, "workout-206-auto-scaling",
+                createStackProps(firstEnvironment), vpcStack101, networkingBasicSubnets102);
+
+        ECSParentStack207 ecsParentStack207 = new ECSParentStack207(app, "workout-207-simple-ECS",
                 createStackProps(firstEnvironment), vpcStack101, networkingBasicSubnets102);
     }
 
