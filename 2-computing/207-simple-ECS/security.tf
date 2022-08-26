@@ -2,8 +2,8 @@
 ## CREATE A PUBLIC SECURITY GROUP, for ALB
 ## - Allowing all HTTP traffic from Internet --> Needed to receive requests from internet
 ## - Allowing all traffic TO everywhere --> Needed to be able to forward calls to WORKERS
-resource "aws_security_group" "sg-207-public" {
-  vpc_id = data.terraform_remote_state.vpc-101.outputs.net-101-vpc-id
+resource "aws_security_group" "cpu-207-sg-1-public" {
+  vpc_id = var.vpc_id
 
   ingress {
     from_port = 80
@@ -21,18 +21,17 @@ resource "aws_security_group" "sg-207-public" {
   tags = {
     Purpose: var.dojo
     Name: "cpu-207-sg-1"
-    Description: "Security Group for ALB"
   }
 }
 
-resource "aws_security_group" "sg-207-private" {
-  vpc_id = data.terraform_remote_state.vpc-101.outputs.net-101-vpc-id
+resource "aws_security_group" "cpu-207-sg-2-private" {
+  vpc_id = var.vpc_id
 
   ingress {
     from_port = 80
     protocol = "tcp"
     to_port = 80
-    security_groups = [aws_security_group.sg-207-public.id]
+    security_groups = [aws_security_group.cpu-207-sg-1-public.id]
   }
 
   egress {
@@ -45,6 +44,5 @@ resource "aws_security_group" "sg-207-private" {
   tags = {
     Purpose: var.dojo
     Name: "cpu-207-sg-2"
-    Description: "Security Group for ECS Tasks"
   }
 }

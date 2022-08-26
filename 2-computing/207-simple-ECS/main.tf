@@ -1,25 +1,19 @@
 ########################################################################################################################
-provider "aws" {
-  region = var.region
-  profile = "aws-workout"
+variable "vpc_id" {
+  type = string
 }
 
-data "terraform_remote_state" "vpc-101" {
-  backend = "s3"
-  config = {
-    bucket = var.tf-s3-bucket
-    region = var.tf-s3-region
-    key = "101-basic-vpc"
-  }
+variable "subnet1_102_id" {
+  type = string
 }
-
-data "terraform_remote_state" "subnets-102" {
-  backend = "s3"
-  config = {
-    bucket = var.tf-s3-bucket
-    key = "102-basic-subnets"
-    region = var.tf-s3-region
-  }
+variable "subnet2_102_id" {
+  type = string
+}
+variable "subnet3_102_id" {
+  type = string
+}
+variable "subnet4_102_id" {
+  type = string
 }
 
 ######################################################################################
@@ -28,13 +22,13 @@ data "terraform_remote_state" "subnets-102" {
 ## with one TargetGroup grouping the ASG definition
 ## with one ListerRule that forward all HTTP traffic to the TargetGroup
 
-resource "aws_lb" "my_alb" {
+resource "aws_lb" "cpu-207-alb" {
   internal           = false
   load_balancer_type = "application"
-  security_groups    = [aws_security_group.sg-207-public.id]
+  security_groups    = [aws_security_group.cpu-207-sg-1-public.id]
   subnets            = [
-    data.terraform_remote_state.subnets-102.outputs.net-102-subnet-1-id,
-    data.terraform_remote_state.subnets-102.outputs.net-102-subnet-2-id
+    var.subnet1_102_id,
+    var.subnet2_102_id
   ]
 
   enable_deletion_protection = false
@@ -46,19 +40,19 @@ resource "aws_lb" "my_alb" {
   }
 }
 
-resource "aws_lb_target_group" "my_alb_target_group" {
+resource "aws_lb_target_group" "cpu-207-alb-target-group" {
   port     = 80
   protocol = "HTTP"
   target_type = "ip" ## Needed for FARGATE awsvpc network mode
-  vpc_id = data.terraform_remote_state.vpc-101.outputs.net-101-vpc-id
+  vpc_id = var.vpc_id
 }
 
-resource "aws_lb_listener" "my_alb_listener" {
-  load_balancer_arn = aws_lb.my_alb.arn
+resource "aws_lb_listener" "cpu-207-alb-listener" {
+  load_balancer_arn = aws_lb.cpu-207-alb.arn
   port = 80
   default_action {
     type             = "forward"
-    target_group_arn = aws_lb_target_group.my_alb_target_group.arn
+    target_group_arn = aws_lb_target_group.cpu-207-alb-target-group.arn
   }
 }
 
