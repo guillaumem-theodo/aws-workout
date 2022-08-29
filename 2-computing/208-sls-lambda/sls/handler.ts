@@ -10,18 +10,10 @@ async function listS3Objects() {
     };
 
     //  List objects in S3 bucket
-    try {
-        const s3Objects = await S3Client.listObjectsV2(params).promise();
-        console.log(s3Objects)
-        return s3Objects;
-    } catch (e) {
-        console.log(e)
-    }
-    return undefined;
+    return await S3Client.listObjectsV2(params).promise();
 }
 
 export const listAllObjects: APIGatewayProxyHandler = async (event, _context) => {
-    console.log(JSON.stringify(event));
     const s3Objects = await listS3Objects();
 
     return {

@@ -1,32 +1,26 @@
 ########################################################################################################################
-provider "aws" {
-  region = var.region
-  profile = "aws-workout"
+variable "vpc_id" {
+  type = string
 }
 
-data "terraform_remote_state" "vpc-101" {
-  backend = "s3"
-  config = {
-    bucket = var.tf-s3-bucket
-    region = var.tf-s3-region
-    key = "101-basic-vpc"
-  }
+variable "subnet1_102_id" {
+  type = string
 }
-
-data "terraform_remote_state" "subnets-102" {
-  backend = "s3"
-  config = {
-    bucket = var.tf-s3-bucket
-    key = "102-basic-subnets"
-    region = var.tf-s3-region
-  }
+variable "subnet2_102_id" {
+  type = string
+}
+variable "s3_bucket1" {
+  type = string
+}
+variable "s3_bucket2" {
+  type = string
 }
 
 ########################################################################################################################
 ## ALLOW 'TEST' EC2 to use Read-only S3 actions
 ########################################################################################################################
 
-resource "aws_iam_role" "iam-role-208" {
+resource "aws_iam_role" "cpu-208-iam-role-1" {
   assume_role_policy = <<EOF
 {
   "Version": "2012-10-17",
@@ -46,18 +40,17 @@ EOF
   tags = {
     Purpose: var.dojo
     Name: "cpu-208-iam-role-1"
-    Description: "A role for the EC2 that allows the EC2 to assume some roles on your behalf"
   }
 }
 
-resource "aws_iam_policy_attachment" "s3-policy-attached-to-role" {
-  name = "cpu-204-iam-role-1-policy-attachment"
-  roles      = [aws_iam_role.iam-role-208.id]
+resource "aws_iam_policy_attachment" "cpu-208-policy-attached-to-role" {
+  name = "cpu-208-policy-attached-to-role"
+  roles      = [aws_iam_role.cpu-208-iam-role-1.id]
   policy_arn = "arn:aws:iam::aws:policy/AmazonS3ReadOnlyAccess"
 }
 
-resource "aws_iam_instance_profile" "instance-profile" {
-  role = aws_iam_role.iam-role-208.id
+resource "aws_iam_instance_profile" "cpu-208-instance-profile-1" {
+  role = aws_iam_role.cpu-208-iam-role-1.id
   name = "cpu-208-instance-profile-1"
   tags = {
     Purpose: var.dojo
@@ -68,14 +61,14 @@ resource "aws_iam_instance_profile" "instance-profile" {
 ########################################################################################################################
 ## TEST EC2
 
-resource "aws_instance" "test-ec2-1" {
+resource "aws_instance" "pu-208-ec2-test-1" {
   ami = data.aws_ami.amazon-linux.image_id
   instance_type = "t2.micro"
   associate_public_ip_address = true
-  subnet_id = data.terraform_remote_state.subnets-102.outputs.net-102-subnet-1-id
-  security_groups = [aws_security_group.sg-208-public.id]
+  subnet_id = var.subnet1_102_id
+  vpc_security_group_ids = [aws_security_group.cpu-208-sg-1.id]
   key_name = "aws-workout-key"
-  iam_instance_profile = aws_iam_instance_profile.instance-profile.id
+  iam_instance_profile = aws_iam_instance_profile.cpu-208-instance-profile-1.id
 
   tags = {
     Purpose: var.dojo
@@ -86,7 +79,7 @@ resource "aws_instance" "test-ec2-1" {
 ########################################################################################################################
 resource "null_resource" "deploy-sls" {
   provisioner "local-exec" {
-    command = "(cd sls; yarn; BUCKET_NAME=${aws_s3_bucket.s3-bucket-1-208.bucket} yarn deploy)"
+    command = "(cd sls; yarn; BUCKET_NAME=${var.s3_bucket1} yarn deploy)"
   }
 
   provisioner "local-exec" {

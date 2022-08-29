@@ -1,6 +1,6 @@
 ########################################################################################################################
-resource "aws_security_group" "sg-208-public" {
-  vpc_id = data.terraform_remote_state.vpc-101.outputs.net-101-vpc-id
+resource "aws_security_group" "cpu-208-sg-1" {
+  vpc_id = var.vpc_id
 
   ingress {
     from_port = 22
