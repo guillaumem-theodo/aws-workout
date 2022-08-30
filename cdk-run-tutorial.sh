@@ -12,3 +12,8 @@ TUTORIAL_KEY=$(basename "$TUTORIAL_DIR")
 source ./backend-env.conf
 echo "Applying CDK Tutorial '$TUTORIAL_KEY' in $TUTORIAL_REGION region"
 (cd cdk || exit; cdk deploy -f --require-approval never "workout-$TUTORIAL_KEY")
+
+if [ -f "$1"/cdk_additional_run.sh ]; then
+  echo "Running additional commands";
+  (cd "$1" || exit; ./cdk_additional_run.sh)
+fi

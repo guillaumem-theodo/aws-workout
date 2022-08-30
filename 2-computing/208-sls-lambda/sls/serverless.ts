@@ -1,9 +1,8 @@
 import type { Serverless } from 'serverless/aws';
 
 const serverlessConfiguration: Serverless = {
-  service: {
-    name: 'cpu-208-sls-lambda',
-  },
+  service: 'cpu-208-sls-lambda'
+  ,
   frameworkVersion: '2',
   custom: {
     webpack: {
@@ -22,17 +21,18 @@ const serverlessConfiguration: Serverless = {
     },
     environment: {
       AWS_NODEJS_CONNECTION_REUSE_ENABLED: '1',
-      BUCKET_NAME: "${opt:bucket_name, 'anyname'}",
+      BUCKET_NAME: "${env:BUCKET_NAME, 'anyname'}",
     },
     iamRoleStatements: [
       {
         Effect: 'Allow',
         Resource: [
-            "arn:aws:s3:::${opt:bucket_name, 'anyname'}",
-          "arn:aws:s3:::${opt:bucket_name, 'anyname'}/*"],
+            "arn:aws:s3:::${env:BUCKET_NAME, 'anyname'}",
+          "arn:aws:s3:::${env:BUCKET_NAME, 'anyname'}/*"],
         Action: ['s3:ListBucket'],
       },
     ],
+    lambdaHashingVersion: 20201221
   },
   functions: {
     hello: {

@@ -8,6 +8,7 @@ import gmi.workouts.computing.workout204.EC2RoleStack204;
 import gmi.workouts.computing.workout205.ALBParentStack205;
 import gmi.workouts.computing.workout206.ASGParentStack206;
 import gmi.workouts.computing.workout207.ECSParentStack207;
+import gmi.workouts.computing.workout208.LambdaStack208;
 import gmi.workouts.networking.workout101.VpcStack101;
 import gmi.workouts.networking.workout102.BasicSubnetsStack102;
 import gmi.workouts.networking.workout103.DefaultRouteAndSecurityGroupStack103;
@@ -82,6 +83,10 @@ public class CdkApp {
 
         ECSParentStack207 ecsParentStack207 = new ECSParentStack207(app, "workout-207-simple-ECS",
                 createStackProps(firstEnvironment), vpcStack101, networkingBasicSubnets102);
+
+        LambdaStack208 lambdaStack208 = new LambdaStack208(app, "workout-208-sls-lambda",
+                createStackProps(firstEnvironment), vpcStack101, networkingBasicSubnets102,
+                s3ForTestsInFirstRegionStack, s3ForTestsInSecondRegionStack);
     }
 
     private static void addNetworkingTutorialsStacks(App app, Environment firstEnvironment, Environment secondEnvironment) {

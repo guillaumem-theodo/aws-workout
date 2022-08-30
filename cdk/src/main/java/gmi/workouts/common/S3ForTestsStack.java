@@ -12,13 +12,15 @@ import java.util.Collections;
 
 public class S3ForTestsStack extends Stack {
 
+    private final Bucket bucket;
+
     public S3ForTestsStack(final Construct scope, String id, StackProps props, String suffixName) {
         super(scope, id, props);
 
-        createBucketInFirstRegionForTests(this, suffixName);
+        this.bucket = createBucketInFirstRegionForTests(this, suffixName);
     }
 
-    private static void createBucketInFirstRegionForTests(final Construct scope, String suffixName) {
+    private Bucket createBucketInFirstRegionForTests(final Construct scope, String suffixName) {
         String tutorialUniqueKey = System.getenv("TUTORIAL_UNIQUE_KEY");
 
         Bucket bucket = Bucket.Builder.create(scope, "common-" + suffixName)
@@ -31,5 +33,11 @@ public class S3ForTestsStack extends Stack {
                 .destinationBucket(bucket)
                 .sources(Collections.singletonList(Source.asset("./fixtures"))) // Fixtures are found at CDK root level
                 .build();
+
+        return bucket;
+    }
+
+    public Bucket getBucket() {
+        return bucket;
     }
 }

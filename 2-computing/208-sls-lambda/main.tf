@@ -61,7 +61,7 @@ resource "aws_iam_instance_profile" "cpu-208-instance-profile-1" {
 ########################################################################################################################
 ## TEST EC2
 
-resource "aws_instance" "pu-208-ec2-test-1" {
+resource "aws_instance" "cpu-208-ec2-test-1" {
   ami = data.aws_ami.amazon-linux.image_id
   instance_type = "t2.micro"
   associate_public_ip_address = true
