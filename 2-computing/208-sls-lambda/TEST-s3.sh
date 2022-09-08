@@ -8,5 +8,5 @@ echo "✅ Test S3 ls from local laptop"
 aws s3 ls --region eu-west-1  --profile aws-workout s3://$TUTORIAL_UNIQUE_KEY-s3-bucket-1
 
 echo "✅ Test Lambda through API Gateway"
-rest_api_id=$(aws apigateway get-rest-apis --region "$TUTORIAL_REGION" --profile aws-workout --query 'items[?name == `dev-cpu-208-sls-lambda`].id' --output text)
+rest_api_id=$(aws apigateway get-rest-apis --region "$TUTORIAL_REGION" --profile aws-workout --query 'items[?name == `dev-cpu-208-api-gtw`].id' --output text)
 curl "https://$rest_api_id.execute-api.$TUTORIAL_REGION.amazonaws.com/dev/demo-208"
