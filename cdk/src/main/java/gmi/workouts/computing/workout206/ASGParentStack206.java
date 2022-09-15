@@ -1,7 +1,7 @@
 package gmi.workouts.computing.workout206;
 
-import gmi.workouts.networking.workout101.VpcStack101;
-import gmi.workouts.networking.workout102.BasicSubnetsStack102;
+import gmi.workouts.networking.workout101.VpcStack;
+import gmi.workouts.networking.workout102.BasicSubnetsStack;
 import software.amazon.awscdk.Stack;
 import software.amazon.awscdk.StackProps;
 import software.constructs.Construct;
@@ -9,17 +9,15 @@ import software.constructs.Construct;
 public class ASGParentStack206 extends Stack {
 
     public ASGParentStack206(final Construct scope, final String id, final StackProps props,
-                             VpcStack101 vpcStack101,
-                             BasicSubnetsStack102 basicSubnetsStack102) {
+                             VpcStack vpcStack,
+                             BasicSubnetsStack subnetsStack) {
         super(scope, id, props);
-        addDependency(vpcStack101);
-        addDependency(basicSubnetsStack102);
+        addDependency(vpcStack);
+        addDependency(subnetsStack);
 
-        ASGNetworkStack206 asgNetworkStack206 = new ASGNetworkStack206(this, "asg-network",
-                vpcStack101, basicSubnetsStack102);
+        ASGNetworkStack asgNetworkStack = new ASGNetworkStack(this, "cpu-206-asg-network", vpcStack, subnetsStack);
 
-        ASGStack206 asgStack206 = new ASGStack206(this, "asg",
-                vpcStack101, basicSubnetsStack102, asgNetworkStack206);
+        new ASGStack(this, "cpu-206-asg", vpcStack, subnetsStack, asgNetworkStack);
 
     }
 

@@ -1,26 +1,25 @@
 package gmi.workouts;
 
 import gmi.workouts.common.S3ForTestsStack;
-import gmi.workouts.computing.workout201.SimpleEC2Stack201;
-import gmi.workouts.computing.workout202.EC2UserDataStack202;
-import gmi.workouts.computing.workout203.EC2MetaDataStack203;
-import gmi.workouts.computing.workout204.EC2RoleStack204;
-import gmi.workouts.computing.workout205.ALBParentStack205;
+import gmi.workouts.computing.workout201.SimpleEC2Stack;
+import gmi.workouts.computing.workout202.EC2UserDataStack;
+import gmi.workouts.computing.workout203.EC2MetaDataStack;
+import gmi.workouts.computing.workout204.EC2RoleStack;
+import gmi.workouts.computing.workout205.ALBParentStack;
 import gmi.workouts.computing.workout206.ASGParentStack206;
-import gmi.workouts.computing.workout207.ECSParentStack207;
-import gmi.workouts.computing.workout208.DeploymentStack208;
-import gmi.workouts.computing.workout208.LambdaStack208;
-import gmi.workouts.networking.workout101.VpcStack101;
-import gmi.workouts.networking.workout102.BasicSubnetsStack102;
-import gmi.workouts.networking.workout103.DefaultRouteAndSecurityGroupStack103;
-import gmi.workouts.networking.workout104.InternetAccessStack104;
-import gmi.workouts.networking.workout105.BastionStack105;
-import gmi.workouts.networking.workout106.NatGatewayStack106;
-import gmi.workouts.networking.workout107.VpcEndpointStack107;
-import gmi.workouts.networking.workout107nat.VpcEndpointWithNatStack107;
-import gmi.workouts.networking.workout108.DnsStack108;
-import gmi.workouts.networking.workout109.VpcPeeringStack109;
-import org.jetbrains.annotations.NotNull;
+import gmi.workouts.computing.workout207.ECSParentStack;
+import gmi.workouts.computing.workout208.ParentStack;
+import gmi.workouts.networking.workout101.VpcStack;
+import gmi.workouts.networking.workout102.BasicSubnetsStack;
+import gmi.workouts.networking.workout103.DefaultRouteAndSecurityGroupStack;
+import gmi.workouts.networking.workout104.InternetAccessStack;
+import gmi.workouts.networking.workout105.BastionStack;
+import gmi.workouts.networking.workout106.NatGatewayStack;
+import gmi.workouts.networking.workout107.VpcEndpointStack;
+import gmi.workouts.networking.workout107nat.VpcEndpointWithNatStack;
+import gmi.workouts.networking.workout108.DnsStack;
+import gmi.workouts.networking.workout109.VpcPeeringNetworkStack;
+import gmi.workouts.networking.workout109.VpcPeeringStack;
 import software.amazon.awscdk.App;
 import software.amazon.awscdk.Environment;
 import software.amazon.awscdk.StackProps;
@@ -31,10 +30,10 @@ public class CdkApp {
     public static final String PURPOSE = "aws-workout";
     public static final String TUTORIAL_REGION = System.getenv("TUTORIAL_REGION");
     public static final String TUTORIAL_ANOTHER_REGION = System.getenv("TUTORIAL_ANOTHER_REGION");
-    private static VpcStack101 vpcStack101;
-    private static BasicSubnetsStack102 networkingBasicSubnets102;
-    private static S3ForTestsStack s3ForTestsInFirstRegionStack;
-    private static S3ForTestsStack s3ForTestsInSecondRegionStack;
+    private static VpcStack vpcStack;
+    private static BasicSubnetsStack networkingBasicSubnets;
+    private static S3ForTestsStack s3InFirstRegionStack;
+    private static S3ForTestsStack s3InSecondRegionStack;
 
     public static void main(final String[] args) {
         App app = new App();
@@ -49,100 +48,91 @@ public class CdkApp {
                 .region(TUTORIAL_ANOTHER_REGION)
                 .build();
 
-        s3ForTestsInFirstRegionStack = new S3ForTestsStack(app, "common-s3-region-1",
+        s3InFirstRegionStack = new S3ForTestsStack(app, "common-s3-region-1",
                 createStackProps(firstEnvironment), "s3-bucket-1");
 
-        s3ForTestsInSecondRegionStack = new S3ForTestsStack(app, "common-s3-region-2",
+        s3InSecondRegionStack = new S3ForTestsStack(app, "common-s3-region-2",
                 createStackProps(secondEnvironment), "s3-bucket-2");
 
-        addNetworkingTutorialsStacks(app, firstEnvironment, secondEnvironment);
-        addComputingTutorialsStacks(app, firstEnvironment, secondEnvironment);
+        StackProps stackProps = createStackProps(firstEnvironment);
+        addNetworkingTutorialsStacks(app, stackProps);
+        addComputingTutorialsStacks(app, stackProps);
 
         app.synth();
 
     }
 
-    private static void addComputingTutorialsStacks(App app, Environment firstEnvironment, Environment secondEnvironment) {
-        SimpleEC2Stack201 simpleEC2Stack201 = new SimpleEC2Stack201(app, "workout-201-basic-ec2",
-                createStackProps(firstEnvironment), vpcStack101, networkingBasicSubnets102);
+    private static void addComputingTutorialsStacks(App app, StackProps stackProps) {
 
-        EC2UserDataStack202 ec2UserDataStack202 = new EC2UserDataStack202(app, "workout-202-user-data",
-                createStackProps(firstEnvironment), vpcStack101, networkingBasicSubnets102);
+        SimpleEC2Stack simpleEC2Stack = new SimpleEC2Stack(app, "workout-201-basic-ec2",
+                stackProps, vpcStack, networkingBasicSubnets);
 
-        EC2MetaDataStack203 ec2MetaDataStack203 = new EC2MetaDataStack203(app, "workout-203-meta-data",
-                createStackProps(firstEnvironment), vpcStack101, networkingBasicSubnets102);
+        EC2UserDataStack ec2UserDataStack = new EC2UserDataStack(app, "workout-202-user-data",
+                stackProps, vpcStack, networkingBasicSubnets);
 
-        EC2RoleStack204 ec2RoleStack204 = new EC2RoleStack204(app, "workout-204-ec2-role",
-                createStackProps(firstEnvironment), vpcStack101, networkingBasicSubnets102,
-                s3ForTestsInFirstRegionStack, s3ForTestsInSecondRegionStack);
+        EC2MetaDataStack ec2MetaDataStack = new EC2MetaDataStack(app, "workout-203-meta-data",
+                stackProps, vpcStack, networkingBasicSubnets);
 
-        ALBParentStack205 albStack205 = new ALBParentStack205(app, "workout-205-alb",
-                createStackProps(firstEnvironment), vpcStack101, networkingBasicSubnets102);
+        EC2RoleStack ec2RoleStack = new EC2RoleStack(app, "workout-204-ec2-role",
+                stackProps, vpcStack, networkingBasicSubnets,
+                s3InFirstRegionStack, s3InSecondRegionStack);
 
-        ASGParentStack206 asgParentStack206 = new ASGParentStack206(app, "workout-206-auto-scaling",
-                createStackProps(firstEnvironment), vpcStack101, networkingBasicSubnets102);
+        ALBParentStack albStack = new ALBParentStack(app, "workout-205-alb",
+                stackProps, vpcStack, networkingBasicSubnets);
 
-        ECSParentStack207 ecsParentStack207 = new ECSParentStack207(app, "workout-207-simple-ECS",
-                createStackProps(firstEnvironment), vpcStack101, networkingBasicSubnets102);
+        ASGParentStack206 asgParentStack = new ASGParentStack206(app, "workout-206-auto-scaling",
+                stackProps, vpcStack, networkingBasicSubnets);
 
-        LambdaStack208 lambdaStack208 = new LambdaStack208(app, "stack-208-sls-lambda",
-                createStackProps(firstEnvironment), vpcStack101, networkingBasicSubnets102,
-                s3ForTestsInFirstRegionStack, s3ForTestsInSecondRegionStack);
+        ECSParentStack ecsParentStack = new ECSParentStack(app, "workout-207-simple-ECS",
+                stackProps, vpcStack, networkingBasicSubnets);
 
-        DeploymentStack208 deploymentStack208 = new DeploymentStack208(app, "workout-208-sls-lambda",
-                createStackProps(firstEnvironment),
-                lambdaStack208
-                );
+        ParentStack lambdaStack = new ParentStack(app, "workout-208-sls-lambda",
+                stackProps,
+                vpcStack, networkingBasicSubnets, s3InFirstRegionStack);
     }
 
-    private static void addNetworkingTutorialsStacks(App app, Environment firstEnvironment, Environment secondEnvironment) {
-        vpcStack101 = new VpcStack101(app, "workout-101-basic-vpc",
-                createStackProps(firstEnvironment));
+    private static void addNetworkingTutorialsStacks(App app, StackProps stackProps) {
+        vpcStack = new VpcStack(app, "workout-101-basic-vpc", stackProps);
 
-        networkingBasicSubnets102 = new BasicSubnetsStack102(app, "workout-102-basic-subnets",
-                createStackProps(firstEnvironment), vpcStack101);
+        networkingBasicSubnets = new BasicSubnetsStack(app, "workout-102-basic-subnets", stackProps, vpcStack);
 
-        DefaultRouteAndSecurityGroupStack103 networkingDefaultRouteAndSg103 =
-                new DefaultRouteAndSecurityGroupStack103(app, "workout-103-vpc-default-route-default-sg",
-                        createStackProps(firstEnvironment), vpcStack101, networkingBasicSubnets102);
+        DefaultRouteAndSecurityGroupStack networkingDefaultRouteAndSg =
+                new DefaultRouteAndSecurityGroupStack(app, "workout-103-vpc-default-route-default-sg",
+                        stackProps, vpcStack, networkingBasicSubnets);
 
-        InternetAccessStack104 internetAccessStack104 =
-                new InternetAccessStack104(app, "workout-104-internet-access",
-                        createStackProps(firstEnvironment), vpcStack101, networkingBasicSubnets102);
+        InternetAccessStack internetAccessStack = new InternetAccessStack(app, "workout-104-internet-access",
+                stackProps, vpcStack, networkingBasicSubnets);
 
-        BastionStack105 bastionStack105 =
-                new BastionStack105(app, "workout-105-bastion",
-                        createStackProps(firstEnvironment), vpcStack101, networkingBasicSubnets102);
+        BastionStack bastionStack = new BastionStack(app, "workout-105-bastion",
+                stackProps, vpcStack, networkingBasicSubnets);
 
-        NatGatewayStack106 natGatewayStack106 =
-                new NatGatewayStack106(app, "workout-106-nat-gtw",
-                        createStackProps(firstEnvironment), vpcStack101, networkingBasicSubnets102, bastionStack105);
+        NatGatewayStack natGatewayStack = new NatGatewayStack(app, "workout-106-nat-gtw",
+                stackProps, vpcStack, networkingBasicSubnets, bastionStack);
 
 
+        VpcEndpointStack vpcEndpointStack =
+                new VpcEndpointStack(app, "workout-107-vpc-endpoint",
+                        stackProps,
+                        vpcStack, networkingBasicSubnets, bastionStack,
+                        s3InFirstRegionStack,
+                        s3InSecondRegionStack);
 
-        VpcEndpointStack107 vpcEndpointStack107 =
-                new VpcEndpointStack107(app, "workout-107-vpc-endpoint",
-                        createStackProps(firstEnvironment),
-                        vpcStack101, networkingBasicSubnets102, bastionStack105,
-                        s3ForTestsInFirstRegionStack,
-                        s3ForTestsInSecondRegionStack);
+        VpcEndpointWithNatStack vpcEndpointWithNatStack =
+                new VpcEndpointWithNatStack(app, "workout-107-vpc-endpoint-with-nat",
+                        stackProps,
+                        vpcStack, networkingBasicSubnets, bastionStack, natGatewayStack,
+                        s3InFirstRegionStack,
+                        s3InSecondRegionStack);
 
-        VpcEndpointWithNatStack107 vpcEndpointWithNatStack107 =
-                new VpcEndpointWithNatStack107(app, "workout-107-vpc-endpoint-with-nat",
-                        createStackProps(firstEnvironment),
-                        vpcStack101, networkingBasicSubnets102, bastionStack105, natGatewayStack106,
-                        s3ForTestsInFirstRegionStack,
-                        s3ForTestsInSecondRegionStack);
+        DnsStack dnsStack = new DnsStack(app, "workout-108-dns", stackProps);
 
-        DnsStack108 dnsStack108 =
-                new DnsStack108(app, "workout-108-dns",
-                        createStackProps(firstEnvironment));
+        VpcPeeringNetworkStack peeringNetworkStack = new VpcPeeringNetworkStack(app, "stack-109-vpc-peering-network",
+                stackProps);
 
-        VpcPeeringStack109 vpcPeeringStack109 =
-                new VpcPeeringStack109(app, "workout-109-vpc-peering",
-                        createStackProps(firstEnvironment));   }
+        VpcPeeringStack vpcPeeringStack = new VpcPeeringStack(app, "workout-109-vpc-peering",
+                stackProps, peeringNetworkStack);
+    }
 
-    @NotNull
     private static StackProps createStackProps(Environment environment) {
         return StackProps.builder()
                 .env(environment)
