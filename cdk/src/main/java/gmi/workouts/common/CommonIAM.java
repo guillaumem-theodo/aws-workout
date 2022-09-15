@@ -10,7 +10,8 @@ import java.util.Collections;
 
 public class CommonIAM {
 
-    private static final String READ_ONLY_S3_ACCESS = "arn:aws:iam::aws:policy/AmazonS3ReadOnlyAccess";
+    public static final String READ_ONLY_S3_ACCESS = "arn:aws:iam::aws:policy/AmazonS3ReadOnlyAccess";
+    public static final String LAMBDA_EXECUTION = "arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole";
 
     public static CfnInstanceProfile createCommonEC2InstanceProfile(Construct scope) {
 

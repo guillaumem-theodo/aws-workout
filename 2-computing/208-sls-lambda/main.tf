@@ -87,8 +87,8 @@ resource "null_resource" "build-sls" {
 }
 
 ########################################################################################################################
-resource "aws_iam_role" "cpu-208-iam_for_lambda" {
-  name = "cpu-208-iam_for_lambda"
+resource "aws_iam_role" "cpu-208-role-for-lambda" {
+  name = "cpu-208-role-for-lambda"
 
   assume_role_policy = <<EOF
 {
@@ -118,7 +118,7 @@ resource "aws_lambda_function" "cpu-208-lambda-1" {
   function_name = "cpu-208-lambda-1"
 
   filename      = "./sls/.serverless/cpu-208-sls-lambda.zip"
-  role          = aws_iam_role.cpu-208-iam_for_lambda.arn
+  role          = aws_iam_role.cpu-208-role-for-lambda.arn
   handler       = "handler.listAllObjects"
 
   runtime = "nodejs12.x"
