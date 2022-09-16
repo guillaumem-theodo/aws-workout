@@ -1,0 +1,8 @@
+## S3 BUCKET used for TERRAFORM REMOTE STATE
+export TERRAFORM_BACKEND_S3_BUCKET_REGION=eu-west-2
+export TERRAFORM_BACKEND_S3_BUCKET=<ADD_A_UNIQUE_IDENTIFIER_HERE>-aws-workout-tf-states
+
+## AWS REGION USED for the TUTORIALS
+export TUTORIAL_REGION=eu-west-1
+export TUTORIAL_ANOTHER_REGION=us-east-1
+export TUTORIAL_UNIQUE_KEY=<ADD_A_UNIQUE_IDENTIFIER_HERE> ###PUT a unique identifier (needed for S3 buckets uniqueness)

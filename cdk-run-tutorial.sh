@@ -12,7 +12,7 @@ TUTORIAL_KEY=$(basename "$TUTORIAL_DIR")
 source ./backend-env.conf
 
 if [ -f "$1"/cdk_additional_pre_run.sh ]; then
-  echo "Running PRE commands";
+  echo "Running PRE-RUN commands for Tutorial '$TUTORIAL_KEY'";
   (cd "$1" || exit; ./cdk_additional_pre_run.sh)
 fi
 
