@@ -19,4 +19,7 @@ fi
 echo "Applying CDK Tutorial '$TUTORIAL_KEY' in $TUTORIAL_REGION region"
 (cd cdk || exit; cdk deploy -f --require-approval never "workout-$TUTORIAL_KEY")
 
-
+if [ -f "$1"/cdk_additional_post_run.sh ]; then
+  echo "Running POST-RUN commands for Tutorial '$TUTORIAL_KEY'";
+  (cd "$1" || exit; ./cdk_additional_post_run.sh)
+fi
