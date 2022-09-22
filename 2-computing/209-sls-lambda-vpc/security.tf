@@ -1,6 +1,6 @@
 ########################################################################################################################
-resource "aws_security_group" "sg-209-public" {
-  vpc_id = data.terraform_remote_state.vpc-101.outputs.net-101-vpc-id
+resource "aws_security_group" "cpu-209-sg-1-public" {
+  vpc_id = var.vpc_id
 
   ingress {
     from_port = 22
@@ -24,14 +24,13 @@ resource "aws_security_group" "sg-209-public" {
 
   tags = {
     Purpose: var.dojo
-    Name: "cpu-209-sg-1"
-    Description: "Security Group for Test EC2"
+    Name: "cpu-209-sg-1-public"
   }
 }
 
 ########################################################################################################################
-resource "aws_security_group" "sg-209-private" {
-  vpc_id = data.terraform_remote_state.vpc-101.outputs.net-101-vpc-id
+resource "aws_security_group" "cpu-209-sg-2-private" {
+  vpc_id = var.vpc_id
 
   ## ALL OUTGOING TRAFFIC INITIATED FROM THE SECURITY GROUP
   egress {
@@ -43,7 +42,6 @@ resource "aws_security_group" "sg-209-private" {
 
   tags = {
     Purpose: var.dojo
-    Name: "cpu-209-sg-2"
-    Description: "Security Group for Lambda"
+    Name: "cpu-209-sg-2-private"
   }
 }

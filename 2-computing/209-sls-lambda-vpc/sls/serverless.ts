@@ -2,7 +2,7 @@ import type {Serverless} from 'serverless/aws';
 
 const serverlessConfiguration: Serverless = {
   service: {
-    name: 'service-209-sls-lambda',
+    name: 'service-209-sls-lambda-vpc',
   },
   frameworkVersion: '2',
   custom: {
@@ -20,23 +20,8 @@ const serverlessConfiguration: Serverless = {
     apiGateway: {
       minimumCompressionSize: 1024,
     },
-    vpc: {
-      securityGroupIds: ["${opt:sg}"],
-      subnetIds: ["${opt:subnet}"],
-    },
     environment: {
-      AWS_NODEJS_CONNECTION_REUSE_ENABLED: '1',
-      BUCKET_NAME: "${opt:bucket_name}",
-    },
-    iamRoleStatements: [
-      {
-        Effect: 'Allow',
-        Resource: [
-            'arn:aws:s3:::${opt:bucket_name}',
-          'arn:aws:s3:::${opt:bucket_name}/*'],
-        Action: ['s3:ListBucket'],
-      },
-    ],
+    }
   },
   functions: {
     listAllObjectsInS3: {

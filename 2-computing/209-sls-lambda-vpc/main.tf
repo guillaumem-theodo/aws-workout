@@ -1,32 +1,28 @@
-########################################################################################################################
-provider "aws" {
-  region = var.region
-  profile = "aws-workout"
+variable "vpc_id" {
+  type = string
 }
 
-data "terraform_remote_state" "vpc-101" {
-  backend = "s3"
-  config = {
-    bucket = var.tf-s3-bucket
-    region = var.tf-s3-region
-    key = "101-basic-vpc"
+variable "subnet1_102_id" {
+  type = string
+}
+variable "subnet3_102_id" {
+  type = string
+}
+
+data "aws_caller_identity" "current" {}
+
+########################################################################################################################
+## Build code zip (do not deploy)
+resource "null_resource" "build-sls" {
+  provisioner "local-exec" {
+    command = "(cd sls; yarn; yarn build)"
   }
 }
 
-data "terraform_remote_state" "subnets-102" {
-  backend = "s3"
-  config = {
-    bucket = var.tf-s3-bucket
-    key = "102-basic-subnets"
-    region = var.tf-s3-region
-  }
-}
-
 ########################################################################################################################
-## ALLOW 'TEST' EC2 to use Read-only S3 actions
-########################################################################################################################
+resource "aws_iam_role" "cpu-209-role-for-lambda" {
+  name = "cpu-209-role-for-lambda"
 
-resource "aws_iam_role" "iam-role-209" {
   assume_role_policy = <<EOF
 {
   "Version": "2012-10-17",
@@ -34,7 +30,7 @@ resource "aws_iam_role" "iam-role-209" {
     {
       "Action": "sts:AssumeRole",
       "Principal": {
-        "Service": "ec2.amazonaws.com"
+        "Service": "lambda.amazonaws.com"
       },
       "Effect": "Allow",
       "Sid": ""
@@ -43,55 +39,114 @@ resource "aws_iam_role" "iam-role-209" {
 }
 EOF
 
-  tags = {
-    Purpose: var.dojo
-    Name: "cpu-209-iam-role-1"
-    Description: "A role for the EC2 that allows the Test EC2 to assume some roles on your behalf"
-  }
-}
+  managed_policy_arns = [
+    "arn:aws:iam::aws:policy/AmazonS3ReadOnlyAccess",
+    "arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole"
+  ]
 
-resource "aws_iam_policy_attachment" "s3-policy-attached-to-role" {
-  name = "cpu-204-iam-role-1-policy-attachment"
-  roles      = [aws_iam_role.iam-role-209.id]
-  policy_arn = "arn:aws:iam::aws:policy/AmazonS3ReadOnlyAccess"
-}
+  inline_policy {
+    name = "lambda_in_vpc_needs_ec2_eni"
 
-resource "aws_iam_instance_profile" "instance-profile" {
-  role = aws_iam_role.iam-role-209.id
-  name = "cpu-209-instance-profile-1"
-  tags = {
-    Purpose: var.dojo
-    Name: "cpu-209-instance-profile-1"
-  }
-}
-
-########################################################################################################################
-## TEST EC2 (needed just to test the S3 access)
-
-resource "aws_instance" "test-ec2-1" {
-  ami = data.aws_ami.amazon-linux.image_id
-  instance_type = "t2.micro"
-  associate_public_ip_address = true
-  subnet_id = data.terraform_remote_state.subnets-102.outputs.net-102-subnet-1-id
-  security_groups = [aws_security_group.sg-209-public.id]
-  key_name = "aws-workout-key"
-  iam_instance_profile = aws_iam_instance_profile.instance-profile.id
-
-  tags = {
-    Purpose: var.dojo
-    Name: "cpu-209-ec2-test-1"
+    policy = jsonencode({
+      Version   = "2012-10-17"
+      Statement = [
+        {
+          Action = [
+            "ec2:DescribeNetworkInterfaces",
+            "ec2:CreateNetworkInterface",
+            "ec2:DeleteNetworkInterface",
+            "ec2:DescribeInstances",
+            "ec2:AttachNetworkInterface"
+          ]
+          Effect   = "Allow"
+          Resource = "*"
+        },
+      ]
+    })
   }
 }
 
 ########################################################################################################################
-resource "null_resource" "deploy-sls" {
-  provisioner "local-exec" {
-    command = "(cd sls; yarn; BUCKET_NAME=${aws_s3_bucket.s3-bucket-1-209.bucket} SUBNET=${data.terraform_remote_state.subnets-102.outputs.net-102-subnet-3-id} SECURITY_GROUP=${aws_security_group.sg-209-private.id} yarn deploy)"
+resource "aws_lambda_function" "cpu-209-lambda-1" {
+  depends_on = [null_resource.build-sls]
+
+  function_name = "cpu-209-lambda-1"
+
+  filename = "./sls/.serverless/service-209-sls-lambda-vpc.zip"
+  role     = aws_iam_role.cpu-209-role-for-lambda.arn
+  handler  = "handler.listAllObjects"
+
+  vpc_config {
+    security_group_ids = [aws_security_group.cpu-209-sg-2-private.id]
+    subnet_ids         = [var.subnet3_102_id]
   }
 
-  provisioner "local-exec" {
-    when    = destroy
-    command = "(cd sls; serverless remove --bucket_name unique-name-s3-bucket-1-209)"
+  runtime = "nodejs12.x"
+
+  environment {
+    variables = {
+      BUCKET_NAME = aws_s3_bucket.cpu-209-s3-bucket.bucket
+    }
   }
+
+}
+
+########################################################################################################################
+resource "aws_api_gateway_rest_api" "cpu-209-api-gtw" {
+  name = "dev-cpu-209-api-gtw"
+}
+
+resource "aws_api_gateway_resource" "cpu-209-api-gtw-resource" {
+  path_part   = "demo-209"
+  parent_id   = aws_api_gateway_rest_api.cpu-209-api-gtw.root_resource_id
+  rest_api_id = aws_api_gateway_rest_api.cpu-209-api-gtw.id
+}
+
+resource "aws_api_gateway_method" "cpu-209-api-gtw-method" {
+  rest_api_id   = aws_api_gateway_rest_api.cpu-209-api-gtw.id
+  resource_id   = aws_api_gateway_resource.cpu-209-api-gtw-resource.id
+  http_method   = "GET"
+  authorization = "NONE"
+}
+
+resource "aws_api_gateway_integration" "cpu-209-api-gtw-integration" {
+  rest_api_id             = aws_api_gateway_rest_api.cpu-209-api-gtw.id
+  resource_id             = aws_api_gateway_resource.cpu-209-api-gtw-resource.id
+  http_method             = aws_api_gateway_method.cpu-209-api-gtw-method.http_method
+  integration_http_method = "POST"
+  type                    = "AWS_PROXY"
+  uri                     = aws_lambda_function.cpu-209-lambda-1.invoke_arn
+}
+
+resource "aws_lambda_permission" "cpu-209-lambda-permission-for-api-gtw" {
+  statement_id  = "AllowExecutionFromAPIGateway"
+  action        = "lambda:InvokeFunction"
+  function_name = aws_lambda_function.cpu-209-lambda-1.function_name
+  principal     = "apigateway.amazonaws.com"
+  source_arn    = "arn:aws:execute-api:${var.region}:${data.aws_caller_identity.current.account_id}:${aws_api_gateway_rest_api.cpu-209-api-gtw.id}/*/${aws_api_gateway_method.cpu-209-api-gtw-method.http_method}${aws_api_gateway_resource.cpu-209-api-gtw-resource.path}"
+}
+
+########################################################################################################################
+resource "aws_api_gateway_deployment" "cpu-209-api-gtw-deployment" {
+  depends_on = [
+    aws_api_gateway_method.cpu-209-api-gtw-method,
+    aws_api_gateway_integration.cpu-209-api-gtw-integration
+  ]
+
+  rest_api_id = aws_api_gateway_rest_api.cpu-209-api-gtw.id
+
+  triggers = {
+    redeployment = sha1(jsonencode(aws_api_gateway_rest_api.cpu-209-api-gtw.body))
+  }
+
+  lifecycle {
+    create_before_destroy = true
+  }
+}
+
+resource "aws_api_gateway_stage" "cpu-209-api-gtw-stage" {
+  deployment_id = aws_api_gateway_deployment.cpu-209-api-gtw-deployment.id
+  rest_api_id   = aws_api_gateway_rest_api.cpu-209-api-gtw.id
+  stage_name    = "dev"
 }
 
