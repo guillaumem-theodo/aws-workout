@@ -4,8 +4,7 @@
   "description": "Serverless lambda workout 208",
   "main": "handler.js",
   "scripts": {
-    "build": "serverless package",
-    "deploy": "serverless deploy"
+    "build": "serverless package"
   },
   "dependencies": {
     "source-map-support": "^0.5.10"

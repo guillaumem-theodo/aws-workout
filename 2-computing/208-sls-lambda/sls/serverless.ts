@@ -19,19 +19,6 @@ const serverlessConfiguration: Serverless = {
     apiGateway: {
       minimumCompressionSize: 1024,
     },
-    environment: {
-      AWS_NODEJS_CONNECTION_REUSE_ENABLED: '1',
-      BUCKET_NAME: "${env:BUCKET_NAME, 'anyname'}",
-    },
-    iamRoleStatements: [
-      {
-        Effect: 'Allow',
-        Resource: [
-            "arn:aws:s3:::${env:BUCKET_NAME, 'anyname'}",
-          "arn:aws:s3:::${env:BUCKET_NAME, 'anyname'}/*"],
-        Action: ['s3:ListBucket'],
-      },
-    ],
     lambdaHashingVersion: 20201221
   },
   functions: {

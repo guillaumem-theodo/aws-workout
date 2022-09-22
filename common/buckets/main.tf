@@ -24,7 +24,6 @@ resource "aws_s3_object" "s3-bucket-object-1" {
   key    = "my-key-1"
   source = "fixtures/file1.txt"
   etag = filemd5("fixtures/file1.txt")
-
 }
 
 resource "aws_s3_object" "s3-bucket-object-2" {
